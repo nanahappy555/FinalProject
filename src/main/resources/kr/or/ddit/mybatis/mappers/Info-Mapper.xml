@@ -1,0 +1,64 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Info-Mapper">
+
+	<select id="selectInfo" parameterType="String" resultType="member">
+		select *
+		from MEMBER
+		where mem_id = #{id}
+	</select>
+	<update id="updateMbti" parameterType="student">
+		update student
+		set MBTI_CD=#{mbtiCd}
+		where stu_cd=#{stuCd}
+	</update>
+	
+	<select id="checkInfo" parameterType="member" resultType="member">
+		select * from member
+		where mem_id=#{memId}
+		and mem_pwd=#{memPwd}
+	</select>
+	
+	<update id="updateInfo" parameterType="student" >
+		update student
+		   set add1=#{add1}, 
+			   add2=#{add2}, 
+			   email=#{email}, 
+			   phone=#{phone},
+			   bank_name=#{bankName}, 
+			   acc_holder=#{accHolder}, 
+			   acc_num=#{accNum},
+			   ano_cd = #{anoCd},
+			   club_cd=#{clubCd}
+		 where stu_cd=#{stuCd}
+	</update>
+	
+	<update id="updateAccount" parameterType="student" >
+		update student
+		   set bank_name=#{bankName}, 
+			   acc_num=#{accNum}
+		 where stu_cd=#{stuCd}
+	</update>
+	
+	<select id="selectAllAcaRecord" parameterType="str" resultType="aca">
+		select STU_CD, SEME_CD, APPLY_DATE, comm_cd_func('majClassCd',MAJ_CLASS_CD) as aca_class, comm_cd_func('applyStatusCd',APPLY_STATUS_CD) as APPLY_STATUS_CD from major_change
+		where stu_cd = #{stuCd}
+		
+		union
+		
+		select STU_ID as stu_cd,SEME_CD,APPLY_DATE, comm_cd_func('acaClassCd',ACA_CLASS_CD) as aca_class,  comm_cd_func('applyStatusCd',APPLY_STATUS_CD) as APPLY_STATUS_CD from aca_status
+		where STU_ID = #{stuCd}
+		
+		union
+		
+		select STU_ID as stu_cd,SEME_CD, APPLY_DATE, comm_cd_func('tlClassCd',TL_CLASS_CD) as aca_class,  comm_cd_func('applyStatusCd',APPLY_STATUS_CD) as APPLY_STATUS_CD  from tl_apply
+		where stu_id=#{stuCd}
+		
+		order by apply_date desc
+	</select>
+	
+	
+	
+</mapper>

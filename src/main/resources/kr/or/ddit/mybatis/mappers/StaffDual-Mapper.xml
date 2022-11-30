@@ -1,0 +1,187 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="StaffDual-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 'date'.toString()">
+			order by apply_date asc
+		</if>
+		<if test="searchType == 'status'.toString()">
+			order by apply_status_cd desc
+		</if>
+	</sql>
+
+	<select id="selectStaffDualList" resultType="staffDual">
+		select * from(select (select comm_cd_name
+		from comm_cd
+		where comm_cd_gr='majClassCd' and comm_cd_val=maj_class_cd) as
+		maj_class_name,
+		b.name,
+		b.stu_cd,
+		(select major_name from major where major_cd = (select major_cd
+		from stu_major
+		where stu_id=a.stu_cd
+		and maj_class_cd = 1)) as present_maj_name,
+		(select col_name
+		from college
+		where col_cd = (select college_cd
+		from major
+		where major_cd=a.major_cd
+		)) as hope_col_name,
+		(select major_name from major where major_cd=a.major_cd) as hope_major_name,
+		(select col_name
+		from college
+		where col_cd=(select college_cd
+		from major
+		where major_cd = (select major_cd from stu_major where stu_id=a.stu_cd and
+		maj_class_cd='1'))) as present_college_name,
+		grade,
+		apply_date,
+		phone,
+		(select comm_cd_name from comm_cd where comm_cd_gr='applyStatusCd' and
+		comm_cd_val=apply_status_cd) as apply_status_cd,
+		major_cha_seq,
+		maj_class_cd
+		from major_change a,
+		student b
+		where a.stu_cd=b.stu_cd
+		and maj_class_cd in ('2','3'))
+		where 1=1
+		<include refid="search" />
+	</select>
+
+	<select id="selectSerachStaffDualCount" resultType="int">
+		select count(*) from(select (select comm_cd_name
+		from comm_cd
+		where comm_cd_gr='majClassCd' and comm_cd_val=maj_class_cd) as
+		maj_class_name,
+		b.name,
+		b.stu_cd,
+		(select major_name from major where major_cd = (select major_cd
+		from stu_major
+		where stu_id=a.stu_cd
+		and maj_class_cd = 1)) as present_maj_name,
+		(select col_name
+		from college
+		where col_cd = (select college_cd
+		from major
+		where major_cd=a.major_cd
+		)) as hope_col_name,
+		(select major_name from major where major_cd=a.major_cd) as hope_major_name,
+		(select col_name
+		from college
+		where col_cd=(select college_cd
+		from major
+		where major_cd = (select major_cd from stu_major where stu_id=a.stu_cd and
+		maj_class_cd='1'))) as present_college_name,
+		grade,
+		apply_date,
+		phone,
+		(select comm_cd_name from comm_cd where comm_cd_gr='applyStatusCd' and
+		comm_cd_val=apply_status_cd) as apply_status_cd,
+		major_cha_seq,
+		maj_class_cd
+		from major_change a,
+		student b
+		where a.stu_cd=b.stu_cd
+		and maj_class_cd in ('2','3'))
+		where 1=1
+		<include refid="search" />
+	</select>
+
+	<select id="selectStaffSubList" resultType="staffDual">
+		select * from(select (select
+		comm_cd_name
+		from comm_cd
+		where comm_cd_gr='majClassCd' and comm_cd_val=maj_class_cd) as
+		maj_class_name,
+		b.name,
+		b.stu_cd,
+		(select major_name from major where major_cd = (select major_cd
+		from stu_major
+		where stu_id=a.stu_cd
+		and maj_class_cd = 1)) as present_maj_name,
+		(select col_name
+		from college
+		where col_cd = (select college_cd
+		from major
+		where major_cd=a.major_cd
+		)) as hope_col_name,
+		(select major_name from major where major_cd=a.major_cd) as hope_major_name,
+		(select col_name
+		from college
+		where col_cd=(select college_cd
+		from major
+		where major_cd = (select major_cd from stu_major where stu_id=a.stu_cd and
+		maj_class_cd='1'))) as present_college_name,
+		grade,
+		apply_date,
+		phone,
+		(select comm_cd_name from comm_cd where comm_cd_gr='applyStatusCd' and
+		comm_cd_val=apply_status_cd) as apply_status_cd,
+		major_cha_seq,
+		maj_class_cd
+		from major_change a,
+		student b
+		where a.stu_cd=b.stu_cd
+		and maj_class_cd in ('4'))
+        where 1=1
+		<include refid="search" />
+	</select>
+	
+	<select id="selectSearchStaffSubCount" resultType="int">
+		select count(*) from(select (select
+		comm_cd_name
+		from comm_cd
+		where comm_cd_gr='majClassCd' and comm_cd_val=maj_class_cd) as
+		maj_class_name,
+		b.name,
+		b.stu_cd,
+		(select major_name from major where major_cd = (select major_cd
+		from stu_major
+		where stu_id=a.stu_cd
+		and maj_class_cd = 1)) as present_maj_name,
+		(select col_name
+		from college
+		where col_cd = (select college_cd
+		from major
+		where major_cd=a.major_cd
+		)) as hope_col_name,
+		(select major_name from major where major_cd=a.major_cd) as hope_major_name,
+		(select col_name
+		from college
+		where col_cd=(select college_cd
+		from major
+		where major_cd = (select major_cd from stu_major where stu_id=a.stu_cd and
+		maj_class_cd='1'))) as present_college_name,
+		grade,
+		apply_date,
+		phone,
+		(select comm_cd_name from comm_cd where comm_cd_gr='applyStatusCd' and
+		comm_cd_val=apply_status_cd) as apply_status_cd,
+		major_cha_seq,
+		maj_class_cd
+		from major_change a,
+		student b
+		where a.stu_cd=b.stu_cd
+		and maj_class_cd in ('4'))
+        where 1=1
+		<include refid="search" />
+	</select>
+
+	<update id="updateDualStatus" parameterType="staffDual">
+		update major_change
+		set apply_status_cd=#{applyStatusCd}
+		where major_cha_seq=#{majorChaSeq}
+	</update>
+
+	<update id="updateSubStatus" parameterType="staffDual">
+		update major_change
+		set apply_status_cd=#{applyStatusCd}
+		where major_cha_seq=#{majorChaSeq}
+	</update>
+
+</mapper>

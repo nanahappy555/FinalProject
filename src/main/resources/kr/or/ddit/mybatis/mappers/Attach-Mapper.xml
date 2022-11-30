@@ -1,0 +1,50 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Attach-Mapper">
+
+	<select id="selectAttachList" parameterType="int"
+		resultType="attach">
+		select ANO_CD,ANO_SEQ,FILENAME,UPLOADPATH,FILESIZE
+		from
+		ATTACH
+		where ano_cd=#{anoCd}
+	</select>
+	<select id="selectAttach" resultType="attach">
+		select *
+		from ATTACH
+		where
+		ano_cd=#{anoCd}
+		and ano_seq = #{anoSeq}
+	</select>
+
+	<update id="insertAttach">
+		insert into
+		ATTACH(ano_cd,ano_seq,filename,uploadpath,filesize)
+		values(#{anoCd},
+		#{anoSeq},#{filename},#{uploadpath},#{filesize})
+	</update>
+
+	<update id="deleteAllAttach" parameterType="int">
+		delete from ATTACH
+		where ano_cd = #{anoCd}
+	</update>
+
+	<update id="deleteAttach" parameterType="attach">
+		delete from ATTACH
+		where
+		ano_cd = #{anoCd}
+		and ano_seq = #{anoSeq}
+	</update>
+
+	<select id="selectAnoNextval" resultType="int">
+		select
+		ANO_CD_SEQ.nextval from dual
+	</select>
+
+	<select id="selectMaxSeqByAnoCd" parameterType="int" resultType="int">
+		select max(ano_seq) + 1 from attach
+		where ano_cd = #{anoCd}
+	</select>
+</mapper>

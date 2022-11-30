@@ -1,0 +1,204 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Email-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and title like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and RECEIVER_ID like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and CONTENT like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'tc'.toString()">
+			and (
+			title like '%'||#{keyword}||'%'
+			or
+			CONTENT like '%'||#{keyword}||'%'
+			)
+		</if>
+		<if test="searchType == 'cw'.toString()">
+			and (
+			RECEIVER_ID like '%'||#{keyword}||'%'
+			or
+			CONTENT like '%'||#{keyword}||'%'
+			)
+		</if>
+		<if test="searchType == 'tcw'.toString()">
+			and (
+			title like '%'||#{keyword}||'%'
+			or
+			RECEIVER_ID like '%'||#{keyword}||'%'
+			or
+			CONTENT like '%'||#{keyword}||'%'
+			)
+		</if>
+	</sql>
+
+	<select id="selectReceiveList" parameterType="String"
+		resultType="mail">
+		select note_seq, title, send_date, recv_chk,
+		(select name
+		from member
+		where mem_id = sender_Id) as senderId
+		from inbox
+		where receiver_id = #{memId}
+		and bin_status_cd = 'inmail'
+		order by send_date desc
+	</select>
+	<select id="selectSendList" resultType="mail">
+		select sent_note_seq, title, send_date,
+		(select name
+		from member
+		where mem_id = receiver_id) as senderId
+		from sent_inbox
+		where sender_id = #{memId}
+		and bin_status_cd = 'inmail'
+		<include refid="search" />
+		order by send_date desc
+	</select>
+
+	<select id="selectMailDetail" parameterType="int" resultType="mail">
+		select note_seq, title, send_date, content, ano_cd, 
+		(select name
+		   from member
+		  where mem_id = sender_Id) as senderId
+		  from inbox
+		 where note_seq=#{noteSeq}
+	</select>
+
+	<select id="selectSentMailDetail" parameterType="int" resultType="mail">
+		select sent_note_seq, title, send_date, content, ano_cd, 
+		(select name
+		   from member
+		  where mem_id = sender_Id) as senderId
+		  from sent_inbox
+		 where sent_note_seq=#{sent_note_seq}
+	</select>
+
+	<insert id="insertReceiveInfo" parameterType="mail">
+		insert into inbox
+		(note_seq, sender_id, receiver_id, title, content, send_date, recv_chk, bin_status_cd, ano_cd)
+
+		values(#{noteSeq}, #{senderId}, #{receiverId}, #{title}, #{content}, sysdate,'안읽음','inmail', #{anoCd})
+
+	</insert>
+
+	<insert id="insertSendMailInfo" parameterType="mail">
+		insert into sent_inbox
+		(sent_note_seq, sender_id, receiver_id, title, content, send_date, bin_status_cd, ano_cd)
+
+		values(#{sentNoteSeq}, #{senderId}, #{receiverId}, #{title}, #{content}, sysdate,'inmail', #{anoCd})
+
+	</insert>
+
+	<update id="updateInboxMailDel" parameterType="mail">
+		update inbox 
+		set bin_status_cd = 'inbin' 
+		where receiver_id = #{memId} 
+		and note_seq=#{noteSeq}
+	</update>
+
+	<update id="updateSentInboxMailDel" parameterType="mail">
+		update sent_inbox
+		set bin_status_cd = 'inbin' 
+		where sender_id = #{memId}
+		and sent_note_seq = #{sentNoteSeq}
+	</update>
+
+	<update id="updateBinMailToReceive" parameterType="mail">
+		update inbox
+		set bin_status_cd = 'inmail' 
+		where receiver_id = #{memId}
+		and note_seq=#{noteSeq}
+	</update>
+
+	<update id="updateBinMailToSent" parameterType="mail">
+		update sent_inbox
+		set bin_status_cd = 'inmail' 
+		where sender_id = #{memId} 
+		and sent_note_seq = #{sentNoteSeq}
+	</update>
+
+	<select id="selectNoteSeqNextVal" resultType="int">
+		select
+		note_seq.nextval from dual
+	</select>
+
+	<select id="selectSentNoteSeqNextVal" resultType="int">
+		select
+		sent_note_seq.nextval from dual
+	</select>
+
+	<select id="selectCountMail" resultType="int">
+		select count(recv_chk)
+		from inbox
+		where receiver_id = #{memId}
+		and recv_chk = '안읽음'
+		and bin_status_cd = 'inmail'
+	</select>
+
+	<update id="updateReadCheck" parameterType="inbox">
+		update inbox
+		set recv_chk = '읽음'
+		where note_seq = #{noteSeq}
+	</update>
+
+	<select id="selectReceiveBin" parameterType="String" resultType="mail">
+		select note_seq, title, send_date,
+		(select name
+		from member
+		where mem_id = sender_Id) as senderId
+		from inbox
+		where receiver_id = #{memId}
+		and bin_status_cd = 'inbin'
+		order by send_date desc
+	</select>
+
+	<select id="selectSentBin" parameterType="String" resultType="mail">
+		select sent_note_seq, title, send_date,
+		(select name
+		from member
+		where mem_id = receiver_id) as senderId
+		from sent_inbox
+		where sender_id = #{memId}
+		and bin_status_cd = 'inbin'
+		order by send_date desc
+	</select>
+
+	<select id="countReceiveMailList" resultType="int">
+		select count(note_seq)
+		from inbox
+		where receiver_id = #{receiverId} and bin_status_cd = 'inmail'
+		<include refid="search" />
+	</select>
+
+	<select id="countSentMailList" resultType="int">
+		select count(sent_note_seq)
+		from sent_inbox
+		where sender_id = #{senderId} and bin_status_cd = 'inmail'
+		<include refid="search" />
+	</select>
+	
+	
+	<select id="getMajorProfListByStuId" parameterType="str" resultType="prof">
+	select prof_cd,name from prof
+	where major_cd in (select major_cd from stu_major 
+                   where stu_id=#{stuCd})
+	</select>
+	<select id="getLecProfListByStuId" parameterType="str" resultType="prof">
+	select prof_cd, name from syllabus s, prof p, lec l
+	where l.lec_cd=s.syl_cd
+	and grade_seme_cd = '0'||(select grade from student
+	                        where stu_cd=#{stuCd})||'0'||(select stu_semester from student
+	                        where stu_cd=#{stuCd})
+	and s.prof_id=p.prof_cd
+	and l.stu_cd=#{stuCd}
+		
+	</select>
+
+</mapper>

@@ -1,0 +1,137 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StaffTlApply-Mapper">
+
+<sql id="search">
+		<if test="searchType == 'c'.toString()">
+			and col_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'm'.toString()">
+			and major_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'as'.toString()">
+			order by apply_status_cd desc
+		</if>
+		<if test="searchType == 'aca'.toString()">
+			order by aca_class_cd desc
+		</if>
+		<if test="searchType == 'cm'.toString()">
+			and (
+			col_name like '%'||#{keyword}||'%'
+			or
+			major_name like '%'||#{keyword}||'%'
+			)
+		</if>
+</sql>
+	
+	
+	<select id="selectStaffTlApplyList" resultType="staffTlApply">
+		select * from(select tl_apply_seq,apply_date,(select major_name
+		from major
+		where major_cd=(select major_cd
+		from stu_major
+		where stu_id=stu_cd
+		and maj_class_cd='1')) as major_name,
+		(select col_name from college where col_cd = (select college_cd
+		from major
+		where major_cd = (select major_cd
+		from stu_major
+		where stu_id=stu_cd
+		and maj_class_cd='1'))) as col_name,
+		a.stu_cd,a.name,a.grade,a.stu_semester,b.tl_app_seme,b.back_seme,(select
+		comm_cd_name
+		from comm_cd
+		where comm_cd_gr='tlClassCd'
+		and comm_cd_val=b.tl_Class_cd) as tl_class_cd,
+		(select comm_cd_name
+		from comm_cd
+		where comm_cd_gr='applyStatusCd'
+		and comm_cd_val=b.apply_status_cd) as apply_status_cd
+		from student a ,tl_apply b
+		where a.stu_cd=b.stu_id
+		and seme_cd='202202'
+		order by apply_status_cd desc,apply_date desc)
+		where 1=1
+		<include refid="search" /> 
+	</select>
+
+	<select id="selectStaffTlApplyListCount" resultType="int">
+		select count(*) from(select tl_apply_seq,apply_date,(select major_name
+		from major
+		where major_cd=(select major_cd
+		from stu_major
+		where stu_id=stu_cd
+		and maj_class_cd='1')) as major_name,
+		(select col_name from college where col_cd = (select college_cd
+		from major
+		where major_cd = (select major_cd
+		from stu_major
+		where stu_id=stu_cd
+		and maj_class_cd='1'))) as col_name,
+		a.stu_cd,a.name,a.grade,a.stu_semester,b.tl_app_seme,b.back_seme,(select
+		comm_cd_name
+		from comm_cd
+		where comm_cd_gr='tlClassCd'
+		and comm_cd_val=b.tl_Class_cd) as tl_class_cd,
+		(select comm_cd_name
+		from comm_cd
+		where comm_cd_gr='applyStatusCd'
+		and comm_cd_val=b.apply_status_cd) as apply_status_cd
+		from student a ,tl_apply b
+		where a.stu_cd=b.stu_id
+		and seme_cd='202202'
+		order by apply_status_cd desc,apply_date desc)
+        where 1=1
+        <include refid="search" /> 
+	</select>
+
+	<select id="selectStaffBackApplyList" resultType="staffTlApply">
+		select * from(select aca_change_seq,grade,stu_semester,tl_reason,a.stu_id, a.apply_date,
+		a.apply_year_seme as back_seme,c.name,
+		(select comm_cd_func('applyStatusCd',a.apply_status_cd) from dual) as
+		aca_class_cd,
+		tl_app_seme,col_name_func(a.stu_id) as col_name,major_name_func(a.stu_id) as major_name
+		from aca_status a,tl_apply b,student c
+		where a.stu_id=b.stu_id
+		and a.stu_id=c.stu_cd
+		and a.seme_cd='202202')
+        where 1=1
+        <include refid="search" />
+	</select>
+	
+	<select id="selectStaffBackApplyListCount" resultType="int">
+	    select count(*) from(select aca_change_seq,grade,stu_semester,tl_reason,a.stu_id, a.apply_date,
+		a.apply_year_seme as back_seme,c.name,
+		(select comm_cd_func('applyStatusCd',a.apply_status_cd) from dual) as
+		aca_class_cd,
+		tl_app_seme,col_name_func(a.stu_id) as col_name,major_name_func(a.stu_id) as major_name
+		from aca_status a,tl_apply b,student c
+		where a.stu_id=b.stu_id
+		and a.stu_id=c.stu_cd
+		and a.seme_cd='202202')
+        where 1=1
+        <include refid="search" />
+	</select>
+	
+	<update id="updateTlStatus" parameterType="staffTlApply">
+		update tl_apply
+		set apply_status_cd = #{applyStatusCd}
+		where tl_apply_seq = #{tlApplySeq}
+	</update>
+
+	<update id="updateBackStatus" parameterType="staffTlApply">
+		update aca_status
+		set apply_status_cd = #{applyStatusCd}
+		where aca_change_seq = #{acaChangeSeq}
+	</update>
+
+	<select id="selectTlapplyAttach" resultType="staffTlApply">
+		select tl_apply_seq,tl_class_cd,tl_reason,apply_date,tl_app_seme,back_seme,apply_status_cd,stu_id,
+		seme_cd,ano_cd,rej_content
+		from tl_apply
+		where tl_apply_seq = #{tlApplySeq}
+	</select>
+	
+</mapper>

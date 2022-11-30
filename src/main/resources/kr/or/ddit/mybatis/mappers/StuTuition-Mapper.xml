@@ -1,0 +1,26 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    
+<mapper namespace="StuTuition-Mapper">
+
+	<select id="selectStuTuitionList" parameterType="String" resultType="stuTuition">
+	
+    select TUITION_SEQ, SEME_CD, AMOUNT, PAYMENT_DATE, (select comm_cd_func('payStatusCd', PAY_STATUS_CD) from dual) as pay_Status_Cd
+	  from tuition
+	 where stu_cd = #{stuCd}
+	
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

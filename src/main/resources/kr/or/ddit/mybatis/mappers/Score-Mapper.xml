@@ -1,0 +1,137 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Score-Mapper">
+	
+	<select id="selectStuInfo" parameterType="str" resultType="student">
+	select * from student
+	where stu_cd=#{stuCd}
+	</select>
+	
+	<select id="selectStuSubjGradeSeme" parameterType="str" resultType="str">
+	select distinct grade_seme_cd from lec
+	where stu_cd=#{stuCd}
+	order by grade_seme_cd
+	</select>
+	
+	
+	<!--과목 점수 정보 리스트 가져오기-->
+	<select id="selectSubScorejInfo" parameterType="lec" resultType="myLecture">
+		select subj_name,classroom,lec_date_1,lec_date_2, lm.subj_cd, syl_cd as lec_cd, comm_cd_func('lecCategoryCd',lec_category_cd) as lec_category_cd,credit,(select name from prof where prof_cd=prof_id) as name, final_score,final_marks
+		from lec_manage lm, syllabus sy,lec lc
+		where lm.subj_cd=sy.subj_cd
+        and lc.lec_cd=sy.syl_cd
+        and lc.stu_cd=#{stuCd}
+		and sy.syl_cd in (select lec_cd from lec
+		where stu_cd=#{stuCd}
+		and grade_seme_cd=#{gradeSemeCd})
+		order by syl_cd
+	</select>
+	<!--과목 성적 기준 가져오기  -->
+	<select id="selectSubjScoreStd" parameterType="lec" resultType="score">
+		select
+	    (select subj_name
+	        from lec_manage lm, syllabus sy
+	        where lm.subj_cd=sy.subj_cd
+	        and sy.syl_cd=std.syl_cd)as subj_name,
+	        syl_cd as lec_cd,mid_ratio,final_ratio,assign_ratio,attend_ratio from marks_std std
+				where syl_cd = #{lecCd}
+	</select>
+	
+	<!-- 과목 정보 가져오기 -->
+	<select id="selectLecInfo" parameterType="lec" resultType="lec">
+		select STU_CD,(select subj_name from lec_manage lm,syllabus sy
+					    where lm.subj_cd=sy.subj_cd
+		                  and sy.syl_cd=#{lecCd}) as subj_name,
+		       LEC_CD, MYLEC_STATUS_CD, GRADE_SEME_CD, EVAL_SUBJ_CONTENT, CDATE, EVAL_STATUS_CD, FINAL_SCORE, FINAL_MARKS, ATTEND_SCORE, ASS_SCORE, MID_SCORE, FIN_SCORE from lec
+		where lec_cd=#{lecCd}
+		and stu_cd=#{stuCd}
+	</select>
+	
+
+	<!--모든 과제 성적점수*비율 점수 가져오기-->
+	<select id="selectAllSubjAssSubScore" parameterType="lec" resultType="score">
+		
+		select a.lec_cd,sum(score*eval_rate*0.01) as score
+		from ass_submit a,assignment b
+		where a.ass_bno=b.ass_bno
+		and a.lec_cd in (select lec_cd from lec
+		where stu_cd=#{stuCd}
+		and grade_seme_cd=#{gradeSemeCd})
+		and stu_cd=#{stuCd}
+		group by a.lec_cd
+		order by lec_cd
+	</select>
+	<!--모든 과목 출결 성적 가져오기-->
+	<select id="selectAllSubjAttendScore" parameterType="lec" resultType="score">
+		select lec_cd,attend_status_cd,count(*) as attend_count from attend
+		where lec_cd in (select lec_cd from lec
+		where stu_cd=#{stuCd}
+		and grade_seme_cd=#{gradeSemeCd})
+		group by lec_cd,attend_status_cd
+		order by lec_cd
+	</select>
+	
+	<!--모든 과목 중간 시험 성적 가져오기-->
+	<select id="selectAllSubjMidScore" parameterType="lec" resultType="score">
+		select lec_cd,score from exam_apply where exam_seq in (select exam_seq from exam
+		where exam_div_cd='mid'
+		and lec_cd in  (select lec_cd from lec
+		where stu_cd=#{stuCd}
+		and grade_seme_cd=#{gradeSemeCd}))
+		order by lec_cd
+	</select>
+	<!--모든 과목 기말 시험 성적 가져오기-->
+	<select id="selectAllSubjFinScore" parameterType="lec" resultType="score">
+	
+		select lec_cd,score from exam_apply where exam_seq in (select exam_seq from exam
+		where exam_div_cd='fin'
+		and lec_cd in  (select lec_cd from lec
+		where stu_cd=#{stuCd}
+		and grade_seme_cd=#{gradeSemeCd}))
+		order by lec_cd
+	</select>
+	
+	<!--해당 학기에 들은 과목 가져오기-->
+	<select id="selectThisSemesterSubjList" parameterType="lec" resultType="str">
+		select lec_cd from lec
+		where stu_cd=#{stuCd}
+		and grade_seme_cd=#{gradeSemeCd}
+		order by lec_cd
+	</select>
+	
+	<!-- 해당 과목 출결 점수 가져오기 -->
+	<select id="selectAttendScore" parameterType="lec" resultType="attend">
+		select attend_status_cd,count(attend_status_cd) as count
+		from attend
+		where lec_cd=#{lecCd}
+		and stu_cd=#{stuCd}
+		group by attend_status_cd
+		order by attend_status_cd
+	</select>
+	
+	<select id="selectAssList" parameterType="lec" resultType="myLecAssignment">
+	 select ab.ass_bno,(select subj_name from lec_manage where subj_cd=(select subj_cd from syllabus where syl_cd=ab.lec_cd)) as subj_name,ab.lec_cd,ab.title,ab.create_date,ab.due_date,ab.eval_rate,ab.content,bc.submit_date,bc.score as score,nvl(comm_cd_func('subEvalStatusCd',sub_eval_status_cd),'미제출')as sub_eval_status_cd from
+   (select * from assignment a
+    where a.lec_cd=#{lecCd}) ab,
+      (select a.ass_bno,a.lec_cd,a.title,create_date,due_date,eval_rate,content,submit_date,score, sub_eval_status_cd from assignment a, ass_submit b
+    where a.ass_bno=b.ass_bno
+    and a.lec_cd=#{lecCd}
+    and stu_cd =#{stuCd}
+    order by create_date desc) bc
+    where ab.ass_bno=bc.ass_bno(+)
+    and ab.lec_cd=bc.lec_cd(+)
+    order by ab.create_date desc
+	</select>
+	<!-- 학생의 학기별 성적 가져오기 -->
+	<select id="selectStuSemeScore" parameterType="str" resultType="semesterStu">
+	
+    select grade||'-'||stu_semester as grade_seme,total_score,seme_cd from semester_stu
+    where stu_cd = #{stuCd}
+    order by seme_cd
+	
+	</select>
+	
+	
+</mapper>

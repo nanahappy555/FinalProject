@@ -1,0 +1,30 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MylecSyllabus-Mapper">
+
+	<select id="selectMyLecSyllabus" parameterType="str" resultType="myLecSyllabus">
+		select lm.subj_cd,subj_name,comm_cd_func('lecCategoryCd',lec_category_cd) as lec_category_cd,comm_cd_func('targetGrade',target_grade) as target_grade,
+		credit,max_stu_num,lec_hour,materials,comm_cd_func('geCd',ge_cd) as ge_cd,mid_ratio,final_ratio,assign_ratio,attend_ratio,
+		comm_cd_func('evalClassCd',eval_class_cd) as eval_class_cd,lec_date_1,lec_date_2,outline
+		from lec_manage lm, syllabus sy, marks_std ms
+		where lm.subj_cd=sy.subj_cd
+		and ms.syl_cd=sy.syl_cd
+		and sy.syl_cd=#{slyCd}
+	</select>
+	<select id="selectMyLecWeekLearning" parameterType="str" resultType="myLecSyllabus">
+	select week_no,syl_cd,content,goal
+		from week_learning
+		where syl_cd=#{slyCd}
+	</select>
+	
+	<select id="selectMyLecWeekNotice" parameterType="str" resultType="weekNotice">
+	  select week_no,lec_cd,content,cdate,ano_cd
+	  from week_notice
+	  where lec_cd=#{lecCd}
+	  order by week_no
+	</select>
+	
+	
+</mapper>

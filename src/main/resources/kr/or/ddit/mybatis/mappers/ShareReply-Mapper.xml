@@ -1,0 +1,55 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ShareReply-Mapper">
+	
+	<select id="selectReplyList" resultType="stuShaReply" parameterType="int">
+		select
+				sha_rno,
+				sha_bno,
+				content,
+				cdate,
+				stu_id,
+				(select name from student where stu_cd = stu_id) as name,
+				lec_cd
+		from stu_sha_reply
+		where sha_bno=#{shaBno}
+		order by cdate
+	</select>
+
+	<select id="selectReply" resultType="stuShaReply">
+		select *
+		from stu_sha_reply
+		where sha_rno=#{shaRno}
+		order by cdate
+	</select>
+	
+	<select id="countReply" resultType="int" parameterType="int">
+		select count(*) 
+		from stu_sha_reply
+		where sha_bno=#{shaBno}
+	</select>
+	
+	<update id="insertReply" parameterType="stuShaReply">
+		insert into stu_sha_reply(sha_rno,sha_bno,content,cdate,stu_id,lec_cd)
+		values(#{shaRno},#{shaBno},#{content},sysdate,#{stuId},#{lecCd})
+	</update>
+	
+	<update id="updateReply" parameterType="stuShaReply">
+		update stu_sha_reply
+		set 
+		content = #{content}
+		where sha_rno=#{shaRno}		
+	</update>
+	
+	<update id="deleteReply" parameterType="int">
+		delete from stu_sha_reply
+		where sha_rno=#{shaRno}		
+	</update>			 
+		
+	<select id="selectReplySeqNextValue" resultType="int" >
+		select sha_rno.nextval as sha_rno from dual
+	</select>
+	
+</mapper>

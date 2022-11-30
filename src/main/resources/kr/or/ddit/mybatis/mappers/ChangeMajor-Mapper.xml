@@ -1,0 +1,83 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ChangeMajor-Mapper">
+	<select id="selectCollegeList" resultType="college">
+		select col_cd,col_name,tuition from college
+		order by col_cd
+	</select>
+	<select id="selectMajorListByCollegeCd" parameterType="str" resultType="major">
+		select MAJOR_CD,MAJOR_NAME,MAJOR_PHONE,MAJOR_WEB,COLLEGE_CD,SEME_CD
+			from major
+			where COLLEGE_CD=#{collegeCd}
+	</select>
+	<select id="selectSearchMajorList" parameterType="searchMajorCommand" resultType="changeMajor">
+		select (select col_name
+			from college
+			where col_cd=#{colCd}) as col_name,
+		A.major_name,B.in_personnel,B.out_personnel,A.major_web
+		from major A,major_semester B
+		where A.major_cd
+		<if test="majorCd=='none'">
+		in (select major_cd from major where college_cd = #{colCd})
+		</if>
+		<if test="majorCd!='none'">
+		=#{majorCd}
+		</if>
+		and A.major_cd=B.major_cd
+		and A.seme_cd=#{semeCd}
+	</select>
+	<update id="updateStuPhone" parameterType="kr.or.ddit.dto.stu.StudentVO">
+		update student
+		set phone= #{phone}
+		where stu_cd = #{stuCd} 
+	</update>
+	<insert id="insertMajorChange" parameterType="changeMajor">
+		insert into major_change(major_cha_seq,stu_cd,major_cd,seme_cd,apply_date,apply_status_cd,maj_class_cd)
+		values(#{majorChaSeq},#{stuCd},(select major_cd from major where major_name=#{majorName}),#{semeCd},sysdate,#{applyStatusCd},#{majClassCd})
+	</insert>
+
+<!-- 	<select id="selectMajorCdbyMajorName" parameterType="str" resultType="str">
+	select major_cd
+	from major
+	where major_name=#{majorName}
+	</select> -->
+	<select id="selectMajorChaSeqNextValue" resultType="int">
+		select major_cha_seq.nextval from dual
+	</select>
+	
+	<select id="selectMajorChangeApplyList" parameterType="str" resultType="changeMajor">
+	select major_cha_seq,major_name, to_char(APPLY_DATE,'YYYY-MM-DD hh:mm:ss') apply_date,comm_cd_func('applyStatusCd',a.apply_status_cd)as APPLY_STATUS_CD,REJ_CONTENT
+		from major_change a,major b
+		where a.major_cd=b.major_cd 
+        and stu_cd = #{stu_cd}
+		and maj_class_cd=1
+		order by APPLY_DATE desc
+	</select>
+	
+	<delete id="deleteChangeMajorApply" parameterType="int">
+	delete from major_change
+	where major_cha_seq = #{majorChaSeq}
+	</delete>
+	<select id="selectDuplicateChangeMajor" parameterType="changeMajor" resultType="int">
+	select major_cha_seq from major_change
+	where stu_cd=#{stuCd}
+	and seme_cd=#{semeCd}
+	and apply_status_cd = 'ing'
+	and maj_class_cd=1
+	</select>
+	<select id="selectDuplicateOkChangeMajor" parameterType="changeMajor" resultType="int">
+	select count(major_cha_seq) from major_change
+	where stu_cd=#{stuCd}
+	and seme_cd=#{semeCd}
+	and apply_status_cd = 'ok'
+	and maj_class_cd=1
+	</select>
+	
+	<update id="updatetMajorChange"  parameterType="changeMajor" >
+	update major_change
+	set major_cd=(select major_cd from major where major_name=#{majorName}),seme_cd=#{semeCd},apply_date=sysdate,apply_status_cd='ing'
+	where major_cha_seq=#{majorChaSeq}
+	</update>
+</mapper>

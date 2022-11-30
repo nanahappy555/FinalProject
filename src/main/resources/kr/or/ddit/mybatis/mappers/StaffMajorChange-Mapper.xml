@@ -1,0 +1,86 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StaffMajorChange-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 'c'.toString()">
+			and col_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'p'.toString()">
+			and present_major_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'h'.toString()">
+			and hope_major_name like '%'||#{keyword}||'%'
+		</if>
+		
+		<if test="searchType == 'ph'.toString()">
+			and (
+			present_major_name like '%'||#{keyword}||'%'
+			or
+			hope_major_name like '%'||#{keyword}||'%'
+			)
+		</if>
+	</sql>
+
+	<select id="selectStaffMajorChangeList" resultType="staffMajorChange">
+	select*from(select (select major_name
+           from major
+          where major_cd=(select major_cd
+           from stu_major where stu_id=c.stu_cd
+                          and maj_class_cd=1)) as present_major_name,
+	        name,
+	        grade,
+	        stu_semester,
+	        apply_date,
+	        phone,
+	        major_name as hope_major_name,
+	        major_cha_seq,
+	        c.stu_cd,
+	        (select col_name from college where col_cd=b.college_cd) as col_name,
+	        (select comm_cd_name
+	           from comm_cd
+	           where comm_cd_gr='applyStatusCd'
+	            and comm_cd_val=apply_status_cd) as apply_status_cd
+		 from major_change A, major B, student C
+		 where A.major_cd = B.major_cd
+		 and A.stu_cd = C.stu_cd
+		 order by apply_status_cd desc)
+         where 1=1
+         <include refid="search" />
+	</select>
+	
+	<select id="selectSearchMajorChangeCount" resultType="int">
+	 select count(*) from(select (select major_name
+           from major
+          where major_cd=(select major_cd
+           from stu_major where stu_id=c.stu_cd
+                          and maj_class_cd=1)) as present_major_name,
+	        name,
+	        grade,
+	        stu_semester,
+	        apply_date,
+	        phone,
+	        major_name as hope_major_name,
+	        major_cha_seq,
+	        c.stu_cd,
+	        (select col_name from college where col_cd=b.college_cd) as col_name,
+	        (select comm_cd_name
+	           from comm_cd
+	           where comm_cd_gr='applyStatusCd'
+	            and comm_cd_val=apply_status_cd) as apply_status_cd
+		 from major_change A, major B, student C
+		 where A.major_cd = B.major_cd
+		 and A.stu_cd = C.stu_cd
+		 order by major_cha_seq desc)
+         where 1=1
+         <include refid="search" />
+	</select>
+	
+	<update	id="updateApplyStatus" parameterType="majorChange">
+		update major_change
+		set apply_status_cd=#{applyStatusCd}
+		where major_cha_seq=#{majorChaSeq}
+	</update>
+</mapper>

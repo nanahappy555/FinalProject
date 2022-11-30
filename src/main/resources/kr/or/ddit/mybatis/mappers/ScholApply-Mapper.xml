@@ -1,0 +1,74 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ScholApply-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 'c'.toString()">
+			and col_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'm'.toString()">
+			and major_name like '%'||#{keyword}||'%'
+		</if>
+		
+		<if test="searchType == 'cm'.toString()">
+			and (
+			col_name like '%'||#{keyword}||'%'
+			or
+			major_name like '%'||#{keyword}||'%'
+			)
+		</if>
+	</sql>
+	
+	<select id="selectSearchListTotalCount" resultType="int">
+		select count(*) from(select schol_app_seq,stu_cd,grade,stu_semester, name,phone,email,apply_date,
+		comm_cd_func('applyStatusCd',apply_status_cd) as apply_status_cd,
+		comm_cd_func('scholCd',schol_cd) as schol_name,
+		(select col_name
+		from college c, stu_major sm, major m
+		where sm.major_cd=m.major_cd
+		and m.college_cd=c.col_cd
+		and maj_class_cd='1'
+		and stu_id=b.stu_id) as col_name,
+		(select major_name from major m,stu_major sm
+		where m.major_cd=sm.major_cd
+		and maj_class_cd='1'
+		and stu_id=b.stu_id) as major_name
+		from student a, schol_apply b
+		where stu_id=stu_cd
+		order by b.apply_status_cd asc,b.apply_date desc
+		)
+		where 1=1
+		<include refid="search" /> 
+	</select>
+
+	<select id="selectList" resultType="scholApplyList">
+		select*from(select schol_app_seq,stu_cd,grade,stu_semester, name,phone,email,apply_date,
+		comm_cd_func('applyStatusCd',apply_status_cd) as apply_status_cd,
+		comm_cd_func('scholCd',schol_cd) as schol_name,
+		(select col_name
+		from college c, stu_major sm, major m
+		where sm.major_cd=m.major_cd
+		and m.college_cd=c.col_cd
+		and maj_class_cd='1'
+		and stu_id=b.stu_id) as col_name,
+		(select major_name from major m,stu_major sm
+		where m.major_cd=sm.major_cd
+		and maj_class_cd='1'
+		and stu_id=b.stu_id) as major_name
+		from student a, schol_apply b
+		where stu_id=stu_cd
+		order by b.apply_status_cd asc,b.apply_date desc
+		)
+		where 1=1
+		<include refid="search" /> 
+	</select>
+
+	<update id="updateScholApply" parameterType="scholApply" >
+		UPDATE SCHOL_APPLY
+		SET APPLY_STATUS_CD = #{applyStatusCd}
+		WHERE SCHOL_APP_SEQ = #{scholAppSeq}
+	</update>
+
+</mapper>

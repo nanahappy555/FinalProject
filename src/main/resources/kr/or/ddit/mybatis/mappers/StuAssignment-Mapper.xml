@@ -1,0 +1,81 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StuAssignment-Mapper">
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and ab.title like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and ab.content like '%'||#{keyword}||'%'			
+		</if>
+	</sql>
+
+	<select id="selectAssignmentListByLecCd" parameterType="criLec" resultType="myLecAssignment">
+  select ab.ass_bno,(select subj_name from lec_manage where subj_cd=(select subj_cd from syllabus where syl_cd=ab.lec_cd)) as subj_name,ab.lec_cd,ab.title,ab.create_date,ab.due_date,ab.eval_rate,ab.content,bc.submit_date,bc.score as score,nvl(comm_cd_func('subEvalStatusCd',sub_eval_status_cd),'미제출')as sub_eval_status_cd from
+   (select * from assignment a
+    where a.lec_cd=#{lecCd}) ab,
+      (select a.ass_bno,a.lec_cd,a.title,create_date,due_date,eval_rate,content,submit_date,score, sub_eval_status_cd from assignment a, ass_submit b
+    where a.ass_bno=b.ass_bno
+    and a.lec_cd=#{lecCd}
+    and stu_cd =#{stuCd}
+    order by create_date desc) bc
+    where ab.ass_bno=bc.ass_bno(+)
+    and ab.lec_cd=bc.lec_cd(+)
+  	<include refid="search" />
+    order by ab.create_date desc
+	</select>
+	
+	<select id= "selectMyAssignmentTotalCount" parameterType="criLec" resultType="int">
+	
+	  select count(*) from
+   (select * from assignment a
+    where a.lec_cd=#{lecCd}) ab,
+      (select a.ass_bno,a.lec_cd,a.title,create_date,due_date,eval_rate,content,submit_date,score, sub_eval_status_cd from assignment a, ass_submit b
+    where a.ass_bno=b.ass_bno
+    and a.lec_cd=#{lecCd}
+    and stu_cd =#{stuCd}
+    order by create_date desc) bc
+    where ab.ass_bno=bc.ass_bno(+)
+    and ab.lec_cd=bc.lec_cd(+)
+  	<include refid="search" />
+    order by ab.create_date desc
+	
+	
+	</select>
+	<select id="selectMyAssignMent" parameterType="int" resultType="myLecAssignment">
+	select ass_bno,	(select name from prof where prof_cd = (select prof_id from syllabus where syl_cd=lec_cd)) as name ,title,create_date,due_date,eval_rate,content,ano_cd,view_cnt
+	from assignment
+	where ass_bno = #{assBno}
+	</select>
+	
+	<update id="increaseAssignmentViewCnt" parameterType="int">
+		update assignment
+		set view_cnt = view_cnt+1
+		where ass_bno=#{assBno}
+		
+	</update>
+	
+	<select id="selectAssSubmit" parameterType="myLecAssignment" resultType="myLecAssignment">
+	  select ASS_BNO,STU_CD,LEC_CD,SUB_CONTENT,SUBMIT_DATE,EVAL_CONTENT,SCORE,ANO_CD,comm_cd_func('subEvalStatusCd',SUB_EVAL_STATUS_CD) as SUB_EVAL_STATUS_CD from ass_submit
+	where ass_bno=#{assBno}
+	and stu_cd=#{stuCd}
+	and lec_cd=#{lecCd}
+	</select>
+	
+	<insert id="insertAssSub" parameterType="myLecAssignment">
+	insert into ass_submit(ass_bno,stu_cd,lec_cd,submit_date,sub_content,ano_cd)
+	values(#{assBno},#{stuCd},#{lecCd},sysdate,#{subContent},#{anoCd})
+	</insert>
+	
+	<update id="updateAssSubmit" parameterType="myLecAssignment">
+	update ass_submit
+	set sub_content=#{subContent},submit_date=sysdate
+	where ass_bno=#{assBno}
+	and stu_cd=#{stuCd}
+	and lec_cd=#{lecCd}
+	</update>
+	
+	
+</mapper>

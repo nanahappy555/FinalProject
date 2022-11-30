@@ -1,0 +1,76 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Student-Mapper">
+	<select id="selectInfo" parameterType="String" resultType="student">
+		select 
+         STU_CD,GRADE,STU_SEMESTER,ADM_DATE,NATION,TL_TRY_COUNT,comm_cd_func('acaStateCd',aca_state_cd) as aca_state_cd,COMPANY_CD,CLUB_CD,
+         SEC_CD,NAME,ENAME,PHONE,ZIPCODE,ADD1,ADD2,EMAIL,BANK_NAME,ACC_HOLDER,ACC_NUM,BIRTHDAY,MBTI_CD,ANO_CD        
+		from student
+		where stu_cd = #{stuCd}
+	</select>
+<select id="selectStuColMajorInfo" parameterType="str" resultType="stuColMajor">
+	select(select major_name
+          from major m,stu_major sm
+         where m.major_cd=sm.major_cd 
+         and stu_id= #{stuCd}
+         and maj_class_cd='1') as fir_maj_name,
+         (select major_name
+          from major m,stu_major sm
+         where m.major_cd=sm.major_cd 
+         and stu_id= #{stuCd}
+         and maj_class_cd='2') as sec_maj_name,
+         (select major_name
+          from major m,stu_major sm
+         where m.major_cd=sm.major_cd 
+         and stu_id= #{stuCd}
+         and maj_class_cd='3') as thi_maj_name,
+         (select major_name
+          from major m,stu_major sm
+         where m.major_cd=sm.major_cd 
+         and stu_id= #{stuCd}
+         and maj_class_cd='4') as sub_maj_name,
+         (select col_name from college
+         where col_cd=(select college_cd from major
+                     where major_cd = (select major_cd from stu_major where maj_class_cd='1' and stu_id= #{stuCd}))) as col_name
+     from dual
+	</select>
+	<select id="selectStuInfoList" parameterType="str" resultType="student">
+	select stu_cd,grade,name,phone,email,
+        (select major_name
+          from major m,stu_major sm
+         where m.major_cd=sm.major_cd 
+         and stu_id= #{stuCd}
+         and maj_class_cd='1') as fir_maj_name,
+         (select col_name from college
+         where col_cd=(select college_cd from major
+                     where major_cd = (select major_cd from stu_major where maj_class_cd='1' and stu_id=#{stuCd}))) as col_name
+     from student
+	</select>
+	<select id="selectClubList" resultType="club">
+	select club_cd,club_name from club
+	</select>
+	
+	<select id="selectStuListByMajorCd" parameterType="str" resultType="student">
+	select STU_CD, GRADE, STU_SEMESTER, ADM_DATE, NATION, TL_TRY_COUNT, ACA_STATE_CD, COMPANY_CD, CLUB_CD, SEC_CD, NAME, ENAME, PHONE, ZIPCODE, ADD1, ADD2, EMAIL, BANK_NAME, ACC_HOLDER, ACC_NUM, BIRTHDAY, MBTI_CD, ANO_CD
+	,maj_class_cd
+	from student s,stu_major sm 
+	where stu_cd = stu_id
+	and major_cd = #{majorCd}
+	</select>
+	<select id="selectColInfo" parameterType="str" resultType="student">
+	select col_name_func(#{stuCd}) as col_name,major_name_func(#{stuCd}) as fir_maj_name
+	from dual
+	</select>
+	<select id="selectCreditInfo" parameterType="str" resultType="student">
+	select sum(credit) total_credit from lec l, syllabus s,lec_manage lm
+	where l.lec_cd=s.syl_cd
+	and s.subj_cd=lm.subj_cd
+	and l.stu_cd=#{stuCd}
+	</select>
+	<select id="selectGradeInfo" parameterType="str" resultType="student">
+	select (2*(grade-1)+stu_semester) as total_seme from student
+	where stu_cd=#{stuCd}
+	</select>
+</mapper>

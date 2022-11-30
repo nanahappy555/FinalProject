@@ -1,0 +1,186 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Data-Mapper">
+	<insert id="insertIntoMember" parameterType="generator">
+		insert into member(mem_id,mem_pwd,name,mem_status_cd,login_failed,mem_class_cd)
+		values(#{memId},#{memPwd},#{name},#{memStatusCd},0,#{memClassCd})
+	</insert>
+	
+	<insert id="insertIntoStudent" parameterType="generator">
+		insert into student
+		values(#{stuCd},#{grade},#{stuSemster},sysdate,#{nation},#{tlTryCount},#{acaStateCd},#{companyCd},#{clubCd},#{secCd},#{name},#{ename},#{phone},#{zipcode},#{add1},#{add2},#{email},#{bankName},#{accHolder},#{accNum},#{birthday},#{mbtiCd})
+	</insert>
+	
+	<insert id="insertIntoStuMajor" parameterType="generator">
+		insert into stu_major
+		values(#{stuMajorCd},#{stuId},#{majorCd},#{division})
+	</insert>
+	<insert id="insertIntoCompany" parameterType="generator">
+		insert into company
+		values(#{companyCd},#{name})
+	</insert>
+	<insert id="insertIntoCompanySec" parameterType="generator">
+		insert into sector
+		values(#{secCd},#{secName})
+	</insert>
+	
+	<insert id="insertIntoMajor" parameterType="generator">
+		insert into major
+		values(#{majorCd},#{majorName},#{majorPhone},#{majorWeb},#{collegeCd},#{semeCd})
+	</insert>
+	<insert id="insertIntoCollege" parameterType="generator">
+		insert into college
+		values(#{colCd},#{colName},#{tuition},#{availCredit})
+	</insert>
+	
+	<insert id="insertIntoLecManage" parameterType="generatorLecVO">
+		insert into lec_manage
+		values(#{subjCd},#{subjName},#{lecCategoryCd},#{targetGrade},#{credit},#{majorCd},#{geCd})
+	</insert>
+	
+	<insert id="insertIntoGeCategory" parameterType="generatorLecVO">
+		insert into ge_category
+		values(#{geCd},#{geCategoryNm})
+	</insert>
+	
+	<insert id="insertIntoSyllabus" parameterType="generatorLecVO">
+		insert into SYLLABUS(syl_cd,max_stu_num,apply_status_cd,apply_date,prof_id,subj_cd,
+							outline,lec_hour,materials,eval_class_cd,lec_date_1,lec_date_2,classroom,seme_cd)
+		values(#{sylCd},#{maxStuNum},'ing',sysdate,#{profId},#{subjCd},#{outline},#{lecHour},#{materials}
+		,#{evalClassCd},#{lecDate1},#{lecDate2},#{classroom},#{semeCd})
+	</insert>
+	
+	<insert id="insertIntoLecOpen" parameterType="generatorLecVO">
+		insert into lec_open
+		values(#{lecCd},'open',0)
+	</insert>
+	<insert id="insertIntoLec" parameterType="generator">
+		insert into lec(stu_cd,lec_cd,mylec_status_cd,grade_seme_cd)
+		values(#{stuCd},#{lecCd},#{mylecStatusCd},#{gradeSemeCd})
+	</insert>
+	<insert id="insertIntoSemesterStu">
+		insert into semester_stu(seme_stu_cd,seme_cd,stu_id)
+		values(#{semeStuCd},#{semeCd},#{stuId})
+	</insert>
+	
+	<insert id="insertIntoProf" parameterType="generator">
+		insert into prof
+		values(#{profCd},#{majorCd},sysdate,sysdate,#{name},#{ename},#{phone},#{add1},#{add2},#{email},#{birthday},#{profPosiCd})	
+	</insert>
+	
+	<insert id="insertIntoMajorSeme" parameterType="generator">
+	insert into major_semester
+	values(#{semeCd},#{majorCd},#{inPersonnel},#{outPersonnel},#{maxPersonnel},#{gradMinCredit},#{minReqCredit},#{mjElecCredit},#{geReqCredit},#{geElecCredit},#{lecApplyMax})
+	</insert>
+	
+	<insert id="insertIntoSurveyForm" parameterType="generator">
+	insert into survey_answer
+	values(#{stuCd},#{surveyNo},#{response})
+	</insert>
+	
+	<update id="updateLecOpen" parameterType="generator">
+		update lec_open
+		set stu_num = #{stuNum}
+		where lec_cd=#{lecCd}
+	</update>
+	
+	<select id="selectStudentList" resultType="String">
+		select mem_id from member
+		where mem_class_cd='stu'
+		order by mem_id
+	</select>
+	<select id="selectListCompanyCdList" resultType="String">
+		select company_cd from company
+	</select>
+	<select id="selectSecCdList" resultType="String">
+		select sec_cd from sector
+	</select>
+	<select id="selectListMember" resultType="generator">
+		select * from member
+	</select>
+	
+	<select id="selectListProf" resultType="generator">
+		select * from prof
+	</select>
+	<select id="selectStuList" resultType="generator">
+		select * from student
+	</select>
+	<select id="selectMemberByMemId" parameterType="str" resultType="generator">
+		select * from member
+		where mem_id=#{memId}
+	</select>
+	
+	<select id="selectListStuMajor" resultType="generator">
+		select * from stu_major
+	</select>
+	<select id="selectListCollege" resultType="generator">
+		select * from college
+	</select>
+	<select id="selectListMajor" resultType="string">
+		select major_cd from major
+	</select>
+	<select id="selectListOpenLecFromSyllabus" resultType="String">
+		select syl_cd from syllabus
+		where apply_status_cd='ok'
+	</select>
+	<select id="selectListOpenLecFromLecOpen" resultType="String">
+		select lec_cd from lec_open
+	</select>
+	
+	<select id="selectListLecManage" resultType="generator">
+		select * from lecManage
+	</select>
+	
+	<select id="selectListSubjectByProfCd" parameterType="str" resultType="str">
+		select subj_cd from lec_manage
+		where major_cd = (select major_cd from prof where prof_cd = #{profId})
+	</select>
+	
+	<select id="selectListGeSubject" resultType="str">
+		select subj_cd from lec_manage
+		where lec_category_cd in ('gese','gere')
+	</select>
+	
+	<select id = "selectMaxStuNum" resultType="int">
+		select max_stu_num from lec_open,syllabus
+		where syl_cd = lec_cd
+		order by syl_cd
+	</select>
+	
+	<select id="selectMaxCreditbyStuCdSemeCd" resultType="String" parameterType="str">
+		select lec_apply_max from major_semester a, student b, stu_major c
+		where c.stu_id=b.stu_cd
+		and a.major_cd=c.major_cd
+		and b.stu_cd=#{stuCd}
+		and maj_class_cd=1
+		and seme_cd='202202'
+	</select>
+	
+	<update id="updateStudentName" parameterType="generator">
+	update student
+	set name=#{name}
+	where stu_cd=#{memId}
+	</update>
+	
+	<update id="updateProfName" parameterType="generator">
+	update prof
+	set name=#{name}
+	where prof_cd=#{memId}
+	</update>
+	
+	<select id="selectSylCd" resultType="str">
+		select syl_cd from syllabus
+		order by syl_cd
+	</select>
+	
+	<select id="selectLecCdByStuCd" parameterType="str" resultType="str">
+	select distinct syl_cd
+	  from syllabus a,lec_manage b
+	  where a.subj_cd in 
+	  (select subj_cd from lec_manage
+	  where major_cd in (select major_cd from stu_major
+	                        where stu_id =#{stuCd}))
+	</select>
+</mapper>

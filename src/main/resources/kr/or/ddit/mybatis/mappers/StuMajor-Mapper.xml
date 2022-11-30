@@ -1,0 +1,28 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StuMajor-Mapper">
+
+	<!-- 과이름으로 가져오는  쿼리문 -->
+	<select id="selectStuMajorList" parameterType="String" resultType="stuMajor">
+		select b.major_name as major_cd,a.maj_class_cd
+			from stu_major a,major b
+			where stu_id=#{stu_id}
+			and a.major_cd=b.major_cd
+			order by maj_class_cd
+	</select>
+	<select id="selectCollegeNameByStuCd" parameterType="str" resultType="str">
+		select col_name_func(#{stuCd})
+		from dual
+	</select>
+	
+	<select id="selectClub" parameterType="str" resultType="club">
+	select club_name
+	  from club
+	  where club_cd=(select club_cd
+	  				   from student
+	  				   where stu_cd=#{stuCd})
+	</select>
+	
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Excel-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 'n'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType2 == 'c'.toString()">
+			and col_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType3 == 'm'.toString()">
+			and major_name like '%'||#{keyword}||'%'
+		</if>
+	</sql>
+	
+	<!-- <insert id="insertExcel" parameterType="hashmap">
+	 insert into member (mem_id) values(#{stuCd})
+	</insert> -->
+	<select id="selectStuMajorCdNextVal" resultType="int">
+	select stu_major_cd_seq.nextval from dual
+	</select>
+	<insert id="insertExcelMember" parameterType="hashmap">
+	 	insert into member (mem_id,mem_pwd,name,mem_status_cd,login_failed,mem_class_cd,birthday,phone)
+	 	values (#{stuCd},#{memPwd},#{name},1,0,#{memClassCd},#{birthday},#{phone})
+	</insert>
+	
+	<insert id="insertExcelStudent" parameterType="hashmap">
+		insert into student (STU_CD, GRADE, STU_SEMESTER, ADM_DATE, NATION, TL_TRY_COUNT, ACA_STATE_CD, COMPANY_CD, CLUB_CD, SEC_CD, NAME, ENAME, PHONE, ZIPCODE, ADD1, ADD2, EMAIL, BANK_NAME, ACC_HOLDER, ACC_NUM, BIRTHDAY)
+		values (#{stuCd},1,1,#{admDate},#{nation},0,'attend','none','none','none',#{name},#{ename},#{phone},#{zipcode},#{add1},#{add2},#{email},#{bankName},#{accHolder},#{accNum},#{birthday})
+	</insert>
+	
+	<insert id="insertExcelStuMajor" parameterType="hashmap">
+		insert into stu_major (stu_major_cd, stu_id, major_cd, maj_class_cd)
+		values (#{stuMajorCd},#{stuCd},(select major_cd from major where major_name=#{majorName}),1)
+	</insert>
+	
+	<select id="selectCollegeList" resultType="college">
+		select col_cd, col_name from college
+		order by col_cd
+	</select>
+	
+	<select id="selectUserRegistList"  resultType="userRegist">
+		select a.col_name, b.major_name, d.name,d.stu_cd, d.grade, d.birthday, 
+			   d.phone, d.email, comm_cd_func('acaStateCd',d.aca_state_cd) as aca_state_cd
+  		  from college a, major b, stu_major c, student d
+		 where b.major_cd = c.major_cd
+   		   and c.stu_id = d.stu_cd
+   		   and a.col_cd = b.college_cd
+   		   <include refid="search" />
+	</select>
+	
+	<select id="selectExcelTotalCount" resultType="int">
+		select count(*)
+		from student
+		where stu_cd is not null
+		<include refid="search" />
+	</select>
+	
+</mapper>

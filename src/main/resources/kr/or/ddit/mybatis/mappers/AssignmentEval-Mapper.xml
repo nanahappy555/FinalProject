@@ -1,0 +1,38 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AssignmentEval-Mapper">
+	
+	
+	
+	<select id="selectStuListByLecCd" resultType="myLecAssignment" parameterType="myLecAssignment">
+		select a.stu_cd,(select name from student where stu_cd=a.stu_cd) as name,sub_eval_status_cd from (select lec.stu_cd,lec.lec_cd from lec,student stu
+			where lec.stu_cd = stu.stu_cd and lec_cd=#{lecCd} and mylec_status_cd = 's') a, (select stu_cd,lec_cd,sub_eval_status_cd
+			from ass_submit
+			where lec_cd=#{lecCd} and ass_bno = #{assBno}) b
+			where a.lec_cd=b.lec_cd(+)
+			and a.stu_cd=b.stu_cd(+)
+			order by name
+	</select>
+	
+	<select id="selectStuAssDetail" resultType="myLecAssignment" parameterType="myLecAssignment">
+	select ASS_BNO,STU_CD,LEC_CD,SUBMIT_DATE,SUB_CONTENT,EVAL_CONTENT,SCORE,ANO_CD,SUB_EVAL_STATUS_CD
+	from ass_submit
+	where ass_bno = #{assBno}
+	and stu_cd = #{stuCd}
+	and lec_cd = #{lecCd}
+	
+	</select>
+	
+	<update id="updateAssignment" parameterType="myLecAssignment">
+	update ass_submit
+	set score=#{score},
+	eval_content = #{evalContent},
+	sub_eval_status_cd = 'evalcom'
+	where ass_bno = #{assBno}
+	and stu_cd = #{stuCd}
+	and lec_Cd = #{lecCd}
+	
+	</update>
+	
+</mapper>

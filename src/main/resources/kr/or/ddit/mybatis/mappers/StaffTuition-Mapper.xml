@@ -1,0 +1,26 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    
+<mapper namespace="StaffTuition-Mapper">
+
+	<select id="selectStaffTuitionList" parameterType="str" resultType="staffTuition">
+	
+	select 'hi' as stu_cd, '3' as grade, '박건영' as name, '인문대학' as col_name, '국문학과' as major_name, 2000000 as amount, '010-1234-5678' as phone,
+        'abcd' as email, sysdate as payment_date, '납부완료' as pay_status_cd
+        from dual
+	
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

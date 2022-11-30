@@ -1,0 +1,17 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ExamApply-Mapper">
+	<insert id="insertScore" parameterType="examApply">
+		insert into exam_apply (stu_cd,lec_cd,score,exam_seq)
+			values ('#{stuCd}','#{lecCd}',#{score},(select exam_seq from exam where exam_div_cd = '#{examDivCd}' and lec_cd = '#{lecCd}'))
+	</insert>
+	
+	<update id="updateScore" parameterType="examApply">
+		update exam_apply
+			set score = #{score}
+			where stu_cd = #{stuCd}
+			and lec_cd = #{lecCd}
+			and exam_seq = (select exam_seq from exam where exam_div_cd = #{examDivCd} and lec_cd = #{lecCd}) 
+	</update>
+</mapper>

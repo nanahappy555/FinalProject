@@ -1,0 +1,78 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ProfCounsel-Mapper">
+
+<select id="selectClassAttitude" parameterType="str" resultType="classAttitude">
+select (select count(case when attend_status_cd in ('le','absent','late') then 1 end)
+   from attend
+   where stu_cd = #{stuCd}
+    and lec_cd in (select lec_cd from lec
+    where stu_cd=#{stuCd}
+    and GRADE_SEME_CD=(
+                        select '0'||grade||'0'||stu_semester from student where stu_cd=#{stuCd}
+                        ))) as miss_attend,
+    (select count(ass.ass_bno) from ass_submit sub,assignment ass
+    where  sub.ass_bno=ass.ass_bno
+    and sub.stu_cd=#{stuCd}
+    and ass.lec_cd in (select lec_cd from lec
+    where stu_cd=#{stuCd}
+    and GRADE_SEME_CD=(
+                        select '0'||grade||'0'||stu_semester from student where stu_cd=#{stuCd}
+                        )))as miss_ass,
+    (select avg(mid_score) from lec
+    where stu_cd=#{stuCd}
+    and lec_cd in (select lec_cd from lec
+    where stu_cd=#{stuCd}
+    and GRADE_SEME_CD=(
+                        select '0'||grade||'0'||stu_semester from student where stu_cd=#{stuCd}
+                        )))as mid_score,
+     (select avg(fin_score) from lec
+    where stu_cd=#{stuCd}
+    and lec_cd in (select lec_cd from lec
+    where stu_cd=#{stuCd}
+    and GRADE_SEME_CD=(
+                        select '0'||grade||'0'||stu_semester from student where stu_cd=#{stuCd}
+                        )))as fin_score
+    from dual
+</select>
+
+<select id="selectStuListByProfId" parameterType="str" resultType="str">
+
+select stu_id from stu_major
+	where major_cd = (select major_cd from prof
+					where prof_cd = #{profCd}
+					and prof_posi_cd='dir')
+	order by stu_id
+</select>
+
+
+<select id="selectSpecialSeq" resultType="int">
+select SPECIAL_SEQ.nextval
+from dual
+</select>
+<select id="selectSpecialNoticeList" parameterType="str" resultType="specialNote">
+
+select SPECIAL_SEQ, (select name from prof where prof_cd = WRITER) as writer, STU_CD, CONTENT, CREATE_DATE from special_note
+where stu_cd=#{stuCd}
+order by create_date desc
+
+</select>
+<select id="selectSpecialNotice" parameterType="int" resultType="specialNote">
+select SPECIAL_SEQ, WRITER, STU_CD, CONTENT, CREATE_DATE
+from special_note
+where special_seq=#{specialSeq}
+</select>
+
+<insert id="insertSpecialNotice" parameterType="specialNote">
+insert into special_note
+values (#{specialSeq},#{writer},#{stuCd},#{content},sysdate)
+</insert>
+
+<update id="updateSpecialNotice" parameterType="specialNote">
+update SPECIAL_NOTE
+set writer=#{writer},stu_cd=#{stuCd},content=#{content}
+where special_seq=#{specialSeq}
+</update>
+</mapper>

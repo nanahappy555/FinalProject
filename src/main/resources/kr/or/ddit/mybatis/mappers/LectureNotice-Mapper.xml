@@ -1,0 +1,69 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LectureNotice-Mapper">
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and title like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and content like '%'||#{keyword}||'%'			
+		</if>
+	</sql>
+	<select id="selectLectureNoticeListByLecCd" parameterType="criLec" resultType="lecNotice">
+		select LEC_NOTICE_NO,LEC_CD,CDATE,CONTENT,TITLE,VIEW_CNT,ANO_CD
+		from LEC_NOTICE
+		where lec_cd = #{lecCd}
+		<include refid="search" />
+		order by cdate desc 
+	</select>
+	
+	<select id="selectLectureNoticeTotalCountByLecCd" parameterType="criLec" resultType="int">
+		select count(*)
+		from LEC_NOTICE
+		where lec_cd = #{lecCd}
+		<include refid="search" />
+		order by cdate desc
+	</select>
+	
+	<select id="selectLectureNoticeByLecNoticeNo" resultType="lecNotice">
+		select *
+		from LEC_NOTICE
+		where lec_notice_no = #{lecNoticeNo}
+	</select>
+	
+	<select id="selectLectureNoticeByImage" resultType="lecNotice">
+		select * 
+		from LEC_NOTICE
+		where content like '%'||#{imageFile}||'%'
+	</select>
+	
+	<update id="insertLectureNotice" parameterType="lecNotice">
+		insert into 
+		LEC_NOTICE(lec_notice_no,lec_cd,cdate,content,title,view_cnt,ano_cd)
+		values(#{lecNoticeNo},#{lecCd}, sysdate, #{content},#{title},0,#{anoCd})
+	</update>
+	
+	<update id="updateLectureNotice" parameterType="lecNotice">
+		update LEC_NOTICE
+		set title=#{title}, content=#{content}
+		where lec_notice_no = #{lecNoticeNo}
+	</update>
+	
+	<update id="deleteLectureNotice" parameterType="int">
+		delete from LEC_NOTICE
+		where lec_notice_no = #{lecNoticeNo}
+	</update>
+	
+	<update id="increaseViewCnt" parameterType="int">
+		update LEC_NOTICE
+		set view_cnt=view_cnt+1
+		where lec_notice_no = #{lecNoticeNo}
+	</update>
+	
+	<select id="selectLectureNoticeSeqNext" resultType="int">
+		select lec_notice_no.nextval as lec_notice_no from dual
+	</select>
+	
+</mapper>

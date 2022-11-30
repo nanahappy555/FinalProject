@@ -1,0 +1,23 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="Prof-Mapper">
+
+	<select id="selectProfByProfId" parameterType="String" resultType="prof">
+		select *
+		from PROF
+		where PROF_CD=#{profId}
+	</select>
+	
+	<select id="selectColNameMajorNameByProfCd" resultType="prof">
+		select col_name,
+        	   m.major_name,
+        	   comm_cd_func('profPosiCd',PROF_POSI_CD) as prof_posi_cd,
+        	   pr.ano_cd
+		  from college col, major m, prof pr
+	  	 where col.col_cd=m.college_cd
+		   and m.major_cd=pr.major_cd 
+		   and prof_cd = #{profCd}
+	</select>
+</mapper>

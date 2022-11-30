@@ -1,0 +1,22 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LecManage-Mapper">
+
+	<select id="selectLecManageBySubjCd" parameterType="String" resultType="lecManage">
+		select *
+		from LEC_MANAGE
+		where SUBJ_CD = #{subjCd}
+	</select>
+	
+	<select id="selectLecManageBySlyCd" resultType="LecManage">
+		select *
+		from lec_manage
+		where subj_cd=( select subj_cd
+		                from syllabus
+		                where syl_cd=#{sylCd})
+	</select>
+
+
+</mapper>

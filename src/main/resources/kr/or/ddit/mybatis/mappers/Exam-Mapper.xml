@@ -1,0 +1,73 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Exam-Mapper">
+
+
+	<select id="selectExamList" resultType="exam">
+	select EXAM_SEQ
+	,LEC_CD
+	,EXAM_DATE
+	,EXAM_CR
+	,Exam_div_cd
+	,comm_cd_func('examDivCd',EXAM_DIV_CD) as examDivName
+	from exam
+	where lec_cd = #{lecCd}
+	order by exam_date
+	</select>
+	
+	<select id="selectExam" resultType="exam" parameterType="int">
+	select EXAM_SEQ
+	,LEC_CD
+	,EXAM_DATE
+	,EXAM_CR
+	,Exam_div_cd
+	,comm_cd_func('examDivCd',EXAM_DIV_CD) as examDivName
+	from exam
+	where EXAM_SEQ = #{examSeq}
+	</select>
+	
+	<select id="selectTotalCount" resultType="int">
+	select count(*) from exam
+	where lec_cd = #{lecCd}
+	</select>
+	
+	<select id="selectUpcomingExamByProfId" parameterType="str" resultType="exam">
+		<![CDATA[
+	select subj_name ,ex.lec_Cd, exam_date, exam_cr,(select comm_cd_name from comm_Cd  where comm_cd_gr = 'examDivCd' and comm_cd_val = exam_div_cd) as exam_div_name
+    from exam ex,syllabus sy,lec_manage lm
+    where ex.lec_Cd = sy.syl_cd
+    and sy.subj_cd = lm.subj_cd 
+    and lec_cd in (select lo.lec_cd
+                    from lec_open lo,syllabus syl,lec_manage lm,prof p
+                    where  lo.lec_cd = syl.syl_cd
+                    and syl.subj_cd = lm.subj_cd
+                    and p.prof_cd = syl.prof_id
+                    and prof_id = #{profId}
+                    and lec_open_status_cd='open')
+    and exam_date >= sysdate -1
+    and rownum <=5
+    order by exam_Date
+    ]]>
+	</select>
+	
+	
+	<insert id="insertExam" parameterType="exam">
+	insert into exam (EXAM_SEQ,LEC_CD,EXAM_DATE,EXAM_CR,EXAM_DIV_CD)
+	values (exam_seq.nextval,#{lecCd},#{examDate},#{examCr},#{examDivCd})
+	</insert>
+	
+	<update id="updateExam" parameterType="exam">
+	update exam
+	set exam_date = #{examDate},exam_cr = #{examCr},exam_div_cd=#{examDivCd}
+	where exam_seq = #{examSeq}
+	</update>
+
+	<delete id="deleteExam" parameterType="int">
+	delete from exam
+	where exam_seq = #{examSeq}
+	</delete>	
+
+
+</mapper>

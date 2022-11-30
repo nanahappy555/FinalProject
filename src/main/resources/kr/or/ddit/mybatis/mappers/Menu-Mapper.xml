@@ -1,0 +1,54 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Menu-Mapper">
+
+	<select id="selectMainMenu" resultType="menu">
+		select *
+		from menu
+		where mCode like '%'||'0000'||'%'
+		and isnav=1
+		and available='1'
+		order by mOrder asc 
+	</select>
+	
+	<select id="selectSubMenu" resultType="menu">
+		select *
+		from menu
+		where upCode = #{mCode} and isNav=1 and available='1'
+		order by mOrder asc
+	</select>
+	
+	<select id="selectMenuByMcode" resultType="menu">
+		select *
+		from menu
+		where mCode = #{mCode}
+	</select>
+	<select id="selectMenuByMname" resultType="menu">
+		select *
+		from menu
+		where mName = #{mName}
+	</select>
+	
+	<select id="getLecListByProf" parameterType="str" resultType="mylecture">
+		select subj_name as lec_name, p.name,p.email_addr ,lo.lec_cd,syl.lec_date_1,syl.lec_date_2,syl.classroom ,lec_open_status_cd 
+	from lec_open lo,syllabus syl,lec_manage lm,prof p
+	where  lo.lec_cd = syl.syl_cd
+	and syl.subj_cd = lm.subj_cd
+	and p.prof_cd = syl.prof_id
+	and prof_id = #{prod_cd}
+	and lec_open_status_cd='open'
+	order by lec_open_status_cd desc
+	</select>
+	<select id="getLecListByStu" parameterType="lec" resultType="mylecture">
+		select syl_cd as lec_cd,subj_name as lec_name
+		from lec a, syllabus b, lec_manage c
+		where a.lec_cd=b.syl_cd
+        and b.subj_cd=c.subj_cd
+        and stu_cd =#{stuCd}
+        and seme_cd=#{semeCd}
+		and MYLEC_STATUS_CD='s'
+	</select>
+	
+</mapper>

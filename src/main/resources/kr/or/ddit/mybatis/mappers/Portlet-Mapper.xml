@@ -1,0 +1,57 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Portlet-Mapper">
+	<select id="selectWidgetList" resultType="portlet">
+		select *
+		from portlet
+		where mem_id = #{memId}
+		and po_avail = 'selected'
+	</select>
+	<select id="selectTotalCountWidgetList" parameterType="str" resultType="int">
+		select count(*)
+		from portlet
+		where mem_id = #{memId}
+		and po_avail = 'selected'
+	</select>
+	
+	<select id="selectWidgetById" parameterType="portlet" resultType="portlet">
+		select *
+		from portlet
+		where mem_id = #{memId}
+		and id = #{id}
+		and po_avail = 'selected'
+	</select>
+	
+	<select id="selectAllWidgetListByMemId" parameterType="str" resultType="portlet">
+		select *
+		from portlet
+		where mem_id = #{memId}
+	</select>
+	
+	<insert id="insertWidgetByIdAvail" parameterType="portlet">
+		insert into portlet
+		select id,#{memId},MEM_CLASS_CD,#{poAvail},w,h,x,y,no_resize,no_move,locked 
+		from portlet_list
+		where id = #{id}
+	</insert>
+	<update id="updateWidget" parameterType="portlet">
+		update portlet
+		set po_avail = #{poAvail},x = #{x}, y = #{y}
+		where mem_id = #{memId}
+		and id = #{id}
+	</update>
+	<update id="updateWidgetAvail">
+		update portlet
+		set po_avail = #{poAvail}
+		where mem_id = #{memId}
+		and id = #{id}
+	</update>
+	<update id="updateWidgetXY">
+		update portlet
+		set x = #{x}, y = #{y}
+		where mem_id = #{memId}
+		and id = #{id}
+	</update>
+</mapper>

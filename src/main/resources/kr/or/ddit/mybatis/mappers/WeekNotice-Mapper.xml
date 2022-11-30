@@ -1,0 +1,22 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="WeekNotice-Mapper">
+
+	<insert id="insertWeekNotice" parameterType="weekNotice">
+	insert into week_notice (WEEK_NO, LEC_CD, CONTENT, CDATE, ANO_CD)
+	values(#{weekNo},#{lecCd},#{content},sysdate,#{anoCd})
+	</insert>
+	
+	<select id="selectMaterialDetail" resultType="weekNotice" parameterType="weekNotice">
+	select WEEK_NO, LEC_CD, CONTENT, CDATE, ANO_CD from WEEK_NOTICE
+	where WEEK_NO=#{weekNo} and LEC_CD=#{lecCd}
+	</select>
+	
+	<update id="updateWeekNotice" parameterType="weekNotice">
+	update week_notice
+	set CONTENT = #{content}
+	where WEEK_NO=#{weekNo} and LEC_CD=#{lecCd}
+	</update>
+</mapper>

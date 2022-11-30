@@ -1,0 +1,82 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Attend-Mapper">
+	<select id="selectAttendListByLecCd" parameterType="attend" resultType="attend">
+		select a.ATTEND_SEQ,a.STU_CD,a.LEC_CD,a.ATTEND_STATUS_CD,a.ATTEND_DATE,a.SEME_CD,b.NAME
+		from attend a, student b
+        where a.stu_cd=b.stu_cd
+		and lec_cd = #{lecCd}
+		and seme_cd = #{semeCd}
+		and to_char(attend_date,'yyyy/mm/dd') = to_char(#{attendDate},'yyyy/mm/dd')
+		order by b.name
+	</select>
+	
+	<select id="lastDateByLecCd" resultType="attend">
+		select max(attend_date) as attend_date 
+		from attend 
+		where lec_cd = #{lecCd}
+		order by attend_date
+	</select>
+	
+	<select id="selectAttendListByStuCd" resultType="attend">
+		SELECT ATTEND_DATE, ATTEND_STATUS_CD
+		FROM ATTEND
+		WHERE LEC_CD = #{lecCd}
+		and STU_CD = #{stuCd}
+		and seme_cd = #{semeCd}
+		order by ATTEND_DATE
+	</select>
+	
+	<select id="selectTotalCountAttend" parameterType="attend" resultType="int">
+		select count(*)
+		from attend
+		where lec_cd = #{lecCd}
+		and seme_cd = #{semeCd}
+		and attend_date = #{attendDate}
+	</select>
+	
+	<update id="insertAttend" parameterType="attend">
+		insert into attend (attend_seq,stu_cd,lec_cd,attend_status_cd,attend_date,seme_cd)
+		values(#{attendSeq}, #{stuCd}, #{lecCd}, 'attend', #{attendDate}, #{semeCd})
+	</update>
+	
+ 	<update id="updateAttend" parameterType="attend">
+		update attend
+		set attend_status_cd = #{attendStatusCd}
+		where attend_seq = #{attendSeq}
+	</update>
+
+	<update id="deleteAttend">
+		delete from attend
+		where stu_cd = #{stuCd}
+	</update>
+	
+	<select id="selectAttendSeqNext" resultType="int">
+		select attend_seq.nextval as attend_seq from dual
+	</select>
+	
+	<select id="selectAllAttendCountInfoBystuCd" parameterType="attend">
+	select count(case when attend_status_cd = 'attend' then 1 end) as attendCount,
+       count(case when attend_status_cd = 'absent' then 1 end) as absentCount,
+       count(case when attend_status_cd = 'late' then 1 end) as lateCount,
+       count(case when attend_status_cd = 'le' then 1 end) as leCount
+       from attend
+       where stu_cd = '#{stuCd}'
+	</select>
+	<select id="selectAllAttendByStuCd" parameterType="attend" resultType="attend">
+		SELECT a.lec_cd, l.subj_name,count(case when attend_status_cd = 'attend' then 1 end) as attendCnt,
+       	count(case when attend_status_cd = 'absent' then 1 end) as absentCnt,
+       	count(case when attend_status_cd = 'late' then 1 end) as lateCnt,
+       	count(case when attend_status_cd = 'le' then 1 end) as leCnt
+		FROM ATTEND a, lec_manage l,syllabus s
+		where a.lec_cd=s.syl_cd
+        and s.subj_cd=l.subj_cd
+        and a.STU_CD = #{stuCd}
+		and s.seme_cd = #{semeCd}
+        group by a.lec_cd, l.subj_name
+		order by a.lec_cd
+	</select>
+	
+	
+</mapper>

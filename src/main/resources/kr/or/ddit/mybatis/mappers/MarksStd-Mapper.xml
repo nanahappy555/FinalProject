@@ -1,0 +1,12 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MarksStd-Mapper">
+	
+	<insert id="insertMarksStd" parameterType="marksStd">
+		insert into marks_Std (MARKS_STD_CD, MID_RATIO, FINAL_RATIO, ASSIGN_RATIO, ATTEND_RATIO, SYL_CD)
+		values (MARKS_STD_SEQ.nextVal,#{midRatio},#{finalRatio},#{assignRatio},#{attendRatio},#{sylCd})
+	</insert>
+	
+</mapper>

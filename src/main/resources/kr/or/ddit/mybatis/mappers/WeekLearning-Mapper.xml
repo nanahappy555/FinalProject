@@ -1,0 +1,12 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="WeekLearning-Mapper">
+
+	<insert id="insertWeekLearning" parameterType="weekLearning">
+	insert into week_learning (WEEK_NO, SYL_CD, CONTENT, GOAL)
+	values(#{weekNo},#{sylCd},#{content},#{goal})
+	</insert>
+	
+</mapper>

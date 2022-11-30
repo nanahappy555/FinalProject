@@ -1,0 +1,85 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Staff-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and title like '%'||#{keyword}||'%' 
+		</if>
+		<!-- <if test="searchType == 'w'.toString()">
+			and staff_id like '%'||#{keyword}||'%'
+		</if>
+		
+		<if test="searchType == 'tw'.toString()">
+			and (
+			title like '%'||#{keyword}||'%'
+			or
+			staff_id like '%'||#{keyword}||'%'
+			)
+		</if> -->
+		
+	</sql>
+
+	<select id="selectScNoticeList" resultType="scNotice">
+		select *
+		from
+		SC_NOTICE
+		where sc_nno is not null
+		<include refid="search"/>
+		order by mark_cd, cdate desc
+	</select>
+	
+	<select id="selectOneScNotice" parameterType="int"
+		resultType="scNotice">
+		select * from SC_NOTICE
+		where sc_nno = #{scNno}
+	</select>
+
+	<select id="selectScNoticeTotalCount" resultType="int">
+		select count(*)
+		from sc_notice
+		where sc_Nno is not null
+		<include refid="search"/>
+	</select>
+	<select id="selectScNnoNextValue" resultType="int">
+		select
+		sc_nno.nextVal
+		from dual
+	</select>
+
+	<update id="increaseViewCnt" parameterType="int">
+		update SC_NOTICE
+		set
+		view_cnt=view_cnt+1
+		where sc_nno=#{scNno}
+	</update>
+
+	<update id="insertScNotice" parameterType="scNotice">
+		insert into
+		SC_NOTICE(sc_nno,staff_id,content,title,mark_cd,cdate,view_cnt)
+		values(#{scNno},#{staffId}, #{content},#{title},#{markCd},sysdate,#{viewCnt})
+	</update>
+
+
+	<update id="updateScNotice" parameterType="scNotice">
+		update sc_notice
+		set
+		title=#{title}, content=#{content}
+		where sc_nno=#{scNno}
+	</update>
+
+	<update id="deleteScNotice" parameterType="int">
+		delete
+		from SC_NOTICE
+		where sc_nno=#{scNno}
+	</update>
+	
+	<select id="selectStaffInfoByStaffId" parameterType="str" resultType="staff">
+		select *
+		from staff
+		where staff_id = #{staffId}
+	</select>
+
+</mapper>

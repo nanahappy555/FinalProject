@@ -1,0 +1,70 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LecOpen-Mapper">
+
+	<select id="selectOne" parameterType="String" resultType="lecOpen">
+		select *
+		from lec_open
+		where lec_cd = #{lecCd}
+	</select>
+	
+	<select id="selectList" parameterType="String" resultType="lecOpen">
+		select *
+		from lec_open
+		where lec_open_status_cd = 'open'
+	</select>
+	
+	<select id="selectLectureListForProfByProfId" parameterType="String" resultType="lectureList">
+	select subj_name, p.name,p.email_addr ,lo.lec_cd,syl.lec_date_1,syl.lec_date_2,syl.classroom ,lec_open_status_cd 
+	from lec_open lo,syllabus syl,lec_manage lm,prof p
+	where  lo.lec_cd = syl.syl_cd
+	and syl.subj_cd = lm.subj_cd
+	and p.prof_cd = syl.prof_id
+	and prof_id = #{prod_cd}
+	and lec_open_status_cd='open'
+	order by lec_open_status_cd desc
+	</select>
+	
+	
+	<select id="selectLectureListForProfTotalCount" parameterType="Map" resultType="int">
+	select count(*)
+	from lec_open lo,syllabus syl
+	where  lo.lec_cd = syl.syl_cd
+	and prof_id = #{prod_cd}
+	</select>
+	
+	
+	<update id="addStuNum" parameterType="String">
+		UPDATE lec_open
+		SET 
+		stu_num = stu_num +1
+		WHERE
+		lec_cd = #{lecCd}
+	</update>
+	
+	<update id="subtractStuNum" parameterType="String">
+		UPDATE lec_open
+		SET 
+		stu_num = stu_num - 1
+		WHERE
+		lec_cd = #{lecCd}
+	</update>
+	
+	<select id="selectLecAssSubmitStuList" parameterType="str" resultType="lecOpen">
+		select lo.lec_cd, lm.subj_name, count(a.title) as count,lo.stu_num, count(*) as submitCount
+		from lec_open lo,syllabus syl,lec_manage lm,assignment a, ass_submit ass
+		where  lo.lec_cd = syl.syl_cd
+		and syl.subj_cd = lm.subj_cd
+	    and lo.lec_cd = a.lec_cd
+	    and a.lec_cd = ass.lec_cd
+		and prof_id = #{memId}
+		and lec_open_status_cd='open'
+	    and a.due_date > sysdate
+	    group by lo.lec_cd,lo.stu_num,lm.subj_name
+	    order by lec_cd
+	</select>
+	
+	
+</mapper>

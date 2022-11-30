@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+  <configuration>
+  	<settings>
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+		<setting name="callSettersOnNulls" value="true"/>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+	</settings>
+  	<typeAliases>
+  		<typeAlias type="java.lang.String" alias="str" />
+		<typeAlias type="java.lang.Integer" alias="int" />
+	
+	<typeAlias type="kr.or.ddit.dto.datagenerator.DataGeneratorVO" alias="generator"/>
+    <typeAlias type="kr.or.ddit.dto.datagenerator.DataGeneratorLectureVO" alias="generatorLecVO"/>
+		
+  
+    <typeAlias type="kr.or.ddit.dto.common.MemberVO" alias="member"/>
+    <typeAlias type="kr.or.ddit.dto.stu.BookHistoryVO" alias="bookHistory"/>
+    <typeAlias type="kr.or.ddit.dto.stu.BookVO" alias="book"/>
+    <typeAlias type="kr.or.ddit.dto.stu.CollegeVO" alias="college"/>
+    <typeAlias type="kr.or.ddit.dto.stu.GradAttachVO" alias="gradAttach"/>
+    <typeAlias type="kr.or.ddit.dto.stu.InterviewScriptVO" alias="interviewScript"/>
+    <typeAlias type="kr.or.ddit.dto.stu.InterviewVO" alias="interview"/>
+    <typeAlias type="kr.or.ddit.dto.stu.MbtiVO" alias="mbti"/>
+    <typeAlias type="kr.or.ddit.dto.stu.ScholApplyVO" alias="scholApply"/>
+    <typeAlias type="kr.or.ddit.dto.stu.ScholManageVO" alias="scholManage"/>
+    <typeAlias type="kr.or.ddit.dto.stu.SectorVO" alias="sector"/>
+    <typeAlias type="kr.or.ddit.dto.stu.CounselProfListVO" alias="counselProfList"/>
+    
+	<typeAlias type="kr.or.ddit.dto.stu.StudentVO" alias="student"/>
+    <typeAlias type="kr.or.ddit.dto.stu.CompanyVO" alias="company"/>
+    <typeAlias type="kr.or.ddit.dto.stu.ClubVO" alias="club"/>
+    <typeAlias type="kr.or.ddit.dto.stu.SectorVO" alias="sector"/>
+    <typeAlias type="kr.or.ddit.dto.stu.MajorChangeVO" alias="majorChange"/>
+    <typeAlias type="kr.or.ddit.dto.stu.StuMajorVO" alias="stuMajor"/>
+    <typeAlias type="kr.or.ddit.dto.stu.AcaStatusVO" alias="acaStatus"/>
+    <typeAlias type="kr.or.ddit.dto.stu.SemesterStuVO" alias="semesterStu"/>
+    <typeAlias type="kr.or.ddit.dto.stu.MajorSemesterVO" alias="majorSemester"/>
+    <typeAlias type="kr.or.ddit.dto.stu.ApplyPageVO" alias="applyPage"/>
+
+	<typeAlias type="kr.or.ddit.dto.common.AlarmVO"  alias="alarm"/>      
+    <typeAlias type="kr.or.ddit.dto.common.AttachVO"  alias="attach"/>      
+    <typeAlias type="kr.or.ddit.dto.common.BMManageVO"  alias="bmManage"/>      
+    <typeAlias type="kr.or.ddit.dto.common.BookmarkVO"  alias="bookmark"/>      
+    <typeAlias type="kr.or.ddit.dto.common.CommCdGrVO"  alias="commCdGr"/>      
+    <typeAlias type="kr.or.ddit.dto.common.CommCdVO"  alias="commCd"/>   
+       
+    <typeAlias type="kr.or.ddit.dto.common.InboxVO"  alias="inbox"/>      
+    <typeAlias type="kr.or.ddit.dto.common.MailVO"  alias="mail"/>      
+    <typeAlias type="kr.or.ddit.dto.common.MenuVO"  alias="menu"/>      
+    <typeAlias type="kr.or.ddit.dto.common.PortletVO"  alias="portlet"/>      
+    <typeAlias type="kr.or.ddit.dto.common.PortletListVO"  alias="portletList"/>      
+    <typeAlias type="kr.or.ddit.dto.common.ScheduleVO"  alias="schedule"/>      
+    
+    
+    <typeAlias type="kr.or.ddit.dto.common.ScQnaVO" alias="scQna"/>      
+    <typeAlias type="kr.or.ddit.dto.common.ScScheduleVO"  alias="scSchedule"/>      
+    <typeAlias type="kr.or.ddit.dto.common.SemesterVO"  alias="semester"/>      
+    <typeAlias type="kr.or.ddit.dto.common.SentInboxVO"  alias="sentInbox"/>      
+    <typeAlias type="kr.or.ddit.dto.common.ThreeDepthMenuVO"  alias="threeDepthMenu"/>   
+       
+    <typeAlias type="kr.or.ddit.dto.staff.ScNoticeVO"  alias="scNotice"/>      
+    <typeAlias type="kr.or.ddit.dto.staff.StaffVO"  alias="staff"/>
+    <typeAlias type="kr.or.ddit.dto.staff.SyllabusManegeVO" alias="syllabusManege"/>
+    <typeAlias type="kr.or.ddit.dto.staff.SyllabusDetailVO" alias="syllabusDetail"/>
+
+	<typeAlias type="kr.or.ddit.dto.stu.StudyShareVO" alias="studyShare"/>
+	<typeAlias type="kr.or.ddit.dto.stu.StuShaReplyVO" alias="stuShaReply"/>
+	<typeAlias type="kr.or.ddit.dto.stu.RecoRepoVO" alias="recoRepo"/>
+	<typeAlias type="kr.or.ddit.dto.stu.CsApplyVO" alias="csApply"/>
+	<typeAlias type="kr.or.ddit.dto.stu.SurveyFormVO" alias="surveyForm"/>
+	<typeAlias type="kr.or.ddit.dto.stu.SurveyAnswerVO" alias="surveyAnswer"/>
+	<typeAlias type="kr.or.ddit.dto.stu.TlApplyVO" alias="tlApply"/>
+	<typeAlias type="kr.or.ddit.dto.stu.TuitionVO" alias="tuition"/>
+	<typeAlias type="kr.or.ddit.dto.stu.MajorVO" alias="major"/>
+
+    <typeAlias type="kr.or.ddit.dto.prof.LecOpenVO" alias="lecOpen"/>
+    <typeAlias type="kr.or.ddit.dto.prof.AssignmentVO" alias="assignment"/>
+    <typeAlias type="kr.or.ddit.dto.prof.ExamVO" alias="exam"/>
+    <typeAlias type="kr.or.ddit.dto.prof.ClassAttitudeVO" alias="classAttitude"/>
+    <typeAlias type="kr.or.ddit.dto.stu.ExamApplyVO" alias="examApply"/>
+    <typeAlias type="kr.or.ddit.dto.stu.LecQnaVO" alias="lecQna"/>
+    <typeAlias type="kr.or.ddit.dto.stu.LecVO" alias="lec"/>
+    <typeAlias type="kr.or.ddit.dto.stu.AttendVO" alias="attend"/>
+    <typeAlias type="kr.or.ddit.dto.stu.LecEvalItemsVO" alias="lecEvalItems"/>
+    <typeAlias type="kr.or.ddit.dto.stu.EvalItemsResVO" alias="evalItemsRes"/>
+    <typeAlias type="kr.or.ddit.dto.stu.StuColMajor" alias="stuColMajor"/>
+	<typeAlias type="kr.or.ddit.dto.stu.TuitionVO" alias="stuTuition"/>
+
+	<typeAlias type="kr.or.ddit.dto.LecNoticeVO"  alias="lecNotice"/>
+    <typeAlias type="kr.or.ddit.dto.prof.CsRecordVO" alias="csRecord"/>
+    <typeAlias type="kr.or.ddit.dto.prof.LecQnaResponseVO" alias="lecQnaResponse"/>
+    <typeAlias type="kr.or.ddit.dto.prof.ProfVO" alias="prof"/>
+    <typeAlias type="kr.or.ddit.dto.prof.SyllabusVO" alias="syllabus"/>
+    
+    <typeAlias type="kr.or.ddit.dto.prof.WeekLearningVO" alias="weekLearning"/>
+    <typeAlias type="kr.or.ddit.dto.prof.WeekNoticeVO" alias="weekNotice"/>	
+    <typeAlias type="kr.or.ddit.dto.prof.LecManageVO" alias="lecManage"/>	
+    <typeAlias type="kr.or.ddit.dto.prof.LectureListVO" alias="lectureList"/>	
+    <typeAlias type="kr.or.ddit.dto.prof.SpecialNoteVO" alias="specialNote"/>	
+	
+	<typeAlias type="kr.or.ddit.dto.staff.StaffMajorChangeVO" alias="staffMajorChange"/>
+	
+	 <typeAlias type="kr.or.ddit.dto.stu.ChangeMajorVO" alias="changeMajor"/>
+	 
+	 <typeAlias type="kr.or.ddit.dto.staff.StaffDualVO" alias="staffDual"/>
+	 
+	 <typeAlias type="kr.or.ddit.dto.common.MyLectureVO" alias="mylecture"/>
+	 
+	 <typeAlias type="kr.or.ddit.dto.staff.StaffTlApplyVO" alias="staffTlApply"/>
+	 <typeAlias type="kr.or.ddit.dto.stu.StuColMajor" alias="stuColMajor"/>
+	 <typeAlias type="kr.or.ddit.dto.staff.StaffTuitionVO" alias="staffTuition"/>
+	 <typeAlias type="kr.or.ddit.dto.staff.ScholApplyListVO" alias="scholApplyList"/>
+	 <typeAlias type="kr.or.ddit.dto.staff.StaffStuManageVO" alias="staffStumanage"/>
+	 <typeAlias type="kr.or.ddit.dto.stu.StuScholApplyListVO" alias="scholApplyInfo"/>
+	 <typeAlias type="kr.or.ddit.dto.stu.MyLecAssignmentVO" alias="myLecAssignment"/>
+	 <typeAlias type="kr.or.ddit.dto.prof.MyLecSyllabusVO" alias="myLecSyllabus"/>
+	 <typeAlias type="kr.or.ddit.dto.common.ScoreVO" alias="score"/>
+	 <typeAlias type="kr.or.ddit.dto.prof.MarkVO" alias="mark"/>
+	 <typeAlias type="kr.or.ddit.dto.stu.AcaVO" alias="aca"/>
+	 <typeAlias type="kr.or.ddit.dto.prof.MarksStdVO" alias="marksStd"/>
+	 <typeAlias type="kr.or.ddit.dto.staff.ExcelVO" alias="userRegist"/>
+	 
+	 <!-- command -->	
+	 <typeAlias type="kr.or.ddit.command.stu.SearchMajorCommand" alias="searchMajorCommand"/>	
+	 <typeAlias type="kr.or.ddit.command.CriteriaLec" alias="criLec"/>
+	   <typeAlias type="kr.or.ddit.command.SurveyCommand" alias="surveyCommand"/>
+	 
+	 </typeAliases>
+  	
+  	
+  </configuration>
+  
+  
+  
+  
+  
+  
+  

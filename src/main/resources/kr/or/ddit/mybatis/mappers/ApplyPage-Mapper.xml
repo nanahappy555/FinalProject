@@ -1,0 +1,57 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ApplyPage-Mapper">
+	<select id="selectApplyPageList" resultType="applyPage">
+		
+		select
+	    lec_cd,
+	      nvl((select col_name
+	         from college
+	         where col_cd = (select college_cd
+	                          from major
+	                         where major_cd=lm.major_cd)),' ') as col_name,
+	      nvl((select major_name
+	         from major
+	         where major_cd=lm.major_cd),' ') as major_name,
+	      nvl((select comm_cd_name
+	         from comm_cd
+	         where comm_cd_gr='geCd'
+	           and comm_cd_val=lm.ge_cd),' ') as ge_cd,
+	      (select comm_cd_name
+	         from comm_cd
+	         where comm_cd_gr='targetGrade'
+	          and comm_cd_val = target_grade) as target_grade,
+	      max_stu_num,
+	      stu_num,
+	      lec_date_1,
+	      nvl(lec_date_2,' ') as lec_date_2,
+	      classroom,
+	      credit,
+          subj_name,
+	      (select name from prof where prof_cd=s.prof_id) as prof_name,
+	      seme_cd
+	 from syllabus S, lec_open L,lec_manage lm
+	 where syl_cd = lec_cd
+	 and s.syl_cd != 'SYL0000'
+	 and seme_cd='202202'
+	 and lm.subj_cd=s.subj_cd
+	 order by s.subj_cd
+	</select>
+	<select id="selectMaxCreditbyStuCdSemeCd" resultType="String" parameterType="Map">
+		select lec_apply_max from major_semester a, student b, stu_major c
+		where c.stu_id=b.stu_cd
+		and a.major_cd=c.major_cd
+		and b.stu_cd=#{stuCd}
+		and maj_class_cd=1
+		and seme_cd=#{semeCd}
+	</select>
+	<select id="selectCurrentCreditByStuCd" resultType="String" parameterType="String">
+	select sum(credit) from lec a,syllabus b,lec_manage c
+	where a.lec_cd=b.syl_cd
+	and b.subj_cd=c.subj_cd
+	and stu_cd =#{stuCd}
+	and seme_cd='202202'
+	</select>
+</mapper>

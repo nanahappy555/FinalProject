@@ -1,0 +1,32 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    
+<mapper namespace="StaffStuManage-Mapper">
+
+	<select id="selectStaffStuManageList" parameterType="str" resultType="staffStumanage">
+	
+	select 'hi' as stu_cd, '3' as grade, '박건영' as name, '인문대학' as col_name, '국문학과' as major_name, '950123' as birthday, '010-7777-8888' as phone,
+       	   'abc123@naver.com' as email, '재학' as aca_state_cd
+  	  from dual
+	
+	</select>
+	<select id="selectStaffStuManageProfList" parameterType="str" resultType="staffStumanage">
+	select 'prof' as prof_cd, '인문대학' as col_name, '영어영문학과' as major_name, '김교수' as name, '920111' as birthday, '010-5555-6666' as phone,
+           'pppp@gmail.com' as email, '일반교수' as prof_posi_cd
+      from dual
+	
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

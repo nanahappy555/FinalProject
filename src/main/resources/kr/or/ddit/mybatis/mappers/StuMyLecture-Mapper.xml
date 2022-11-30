@@ -1,0 +1,42 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StuMyLecture-Mapper">
+
+	<select id="selectMyLectureInfo" resultType="myLecture" parameterType="String">
+	select subj_name, comm_cd_func('lecCategoryCd',lec_category_cd)as lec_category_cd, prof_cd, name, email_addr,ano_cd
+    from lec_manage a,syllabus b,prof c
+    where a.subj_cd=b.subj_cd
+    and b.prof_id=c.prof_cd
+    and syl_cd=#{lecCd}
+		
+	</select>
+	
+	<select id="selectTotalAttendInfo" parameterType="attend" resultType="attend">
+		    
+   select attend_status_cd , count(attend_status_cd) attend_cnt from attend
+  where stu_cd=#{stuCd}
+  and lec_cd=#{lecCd}
+  group by attend_status_cd
+  order by attend_status_cd
+		
+	</select>
+	
+	
+	
+	
+	<select id="selectWithdrawalList" parameterType="str" resultType="lec">
+		    
+   select '2' as grade, '박건영' as name, '교필' as lec_category_cd, '3' as credit, '숲힐링캠프' as subj_name, '완료' as eval_status_cd 
+     from dual
+		
+	</select>
+	<update id="updateInfo" parameterType="lec" >
+		  update lec
+		     set MYLEC_STATUS_CD='w'
+		   where stu_cd=#{stuCd}
+             and lec_cd = #{lecCd}
+	</update>
+	
+</mapper>

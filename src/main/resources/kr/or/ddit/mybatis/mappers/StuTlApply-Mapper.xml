@@ -1,0 +1,104 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StuTlApply-Mapper">
+	<select id="selectTlListById" parameterType="String" resultType="tlApply">
+		select TL_APPLY_SEQ,comm_cd_func('tlClassCd',TL_CLASS_CD)as tl_class_cd,TL_REASON,
+		to_char(APPLY_DATE,'yyyy-mm-dd') as apply_date_string,apply_date,TL_APP_SEME,BACK_SEME, comm_cd_func('applyStatusCd',APPLY_STATUS_CD) as APPLY_STATUS_CD, STU_ID,SEME_CD,ANO_CD,REJ_CONTENT
+		from tl_apply
+		where stu_id=#{stuId}
+		and seme_cd='202202'
+		order by apply_date desc
+	</select>
+	<select id="selectBackListById" parameterType="str" resultType="acaStatus">
+	select ACA_CHANGE_SEQ,STU_ID,comm_cd_func('acaClassCd',ACA_CLASS_CD) as aca_class_cd,APPLY_DATE,to_char(apply_date,'yyyy-mm-dd') as apply_date_string,
+	APPLY_YEAR_SEME,comm_cd_func('applyStatusCd',APPLY_STATUS_CD) as apply_status_cd,REJ_CONTENT
+	from aca_status
+	where aca_class_cd='re'
+	and stu_id=#{stuId}
+	and seme_cd='202202'
+	</select>
+	<select id="selectTlClassReason" resultType="commCd">
+	select comm_cd_name,comm_cd_val
+	from comm_cd
+	where comm_cd_gr='tlClassCd'
+	</select>
+	
+	<insert id="insertTlApply" parameterType="tlApply">
+		insert into tl_apply
+		values(#{tlApplySeq},#{tlClassCd},#{tlReason},sysdate,#{tlAppSeme},#{backSeme},'ing',#{stuId},#{semeCd},#{anoCd},#{rejContent})
+	</insert>
+	
+	<select id="selectTlApplyNoNextVal" resultType="int">
+		select tl_apply_seq.nextval from dual
+	</select>
+	
+	<select id="tlApplyDuplicateCheck" parameterType="student" resultType="int">
+	select tl_apply_seq from tl_apply
+		where stu_id=#{stuCd}
+		and seme_cd=#{semeCd}
+	</select>
+	
+	<select id="backApplyDuplicateCheck" parameterType="student" resultType="int">
+	select aca_change_seq from aca_status
+	where stu_id=#{stuCd}
+	and seme_cd=#{semeCd}
+	and aca_class_cd='re'
+	</select>
+	
+	<update id="updateTlApply" parameterType="tlApply">
+	update tl_apply
+	set	tl_class_cd=#{tlClassCd},
+	tl_reason=#{tlReason},
+	apply_date=sysdate,
+	tl_app_seme=#{tlAppSeme},
+	back_seme=#{backSeme},
+	apply_status_cd='ing',
+	stu_id=#{stuId},
+	seme_cd=#{semeCd},
+	rej_content=#{rejContent},
+	ano_cd=#{anoCd}
+	where tl_apply_seq=#{tlApplySeq}
+	</update>
+	
+	
+	<insert id="insertBackApply" parameterType="acaStatus">
+	insert into aca_status
+	values(#{acaChangeSeq},#{stuId},'re',sysdate,#{applyYearSeme},'ing',#{rejContent},#{applyReason},#{semeCd},#{anoCd})
+	</insert>
+	<update id="updateBackApply" parameterType="acaStatus">
+	update aca_status
+	set	APPLY_DATE=sysdate,
+	APPLY_YEAR_SEME=#{applyYearSeme},
+	APPLY_STATUS_CD='ing',
+	APPLY_REASON=#{applyReason},
+	SEME_CD=#{semeCd},
+	rej_content=#{rejContent},
+	ANO_CD=#{anoCd}
+	where ACA_CHANGE_SEQ=#{acaChangeSeq}
+	</update>
+	
+	<select id="selectAcaChangeSeq" resultType="int">
+		select ACA_CHANGE_SEQ.nextval from dual
+	</select>
+	
+	<delete id="deleteBackApply" parameterType="int">
+	delete from aca_status
+	where aca_change_seq=#{acaChangeSeq}
+	
+	</delete>
+	<delete id="deleteTlApply" parameterType="int">
+	delete from tl_apply
+	where TL_APPLY_SEQ = #{tlApplySeq}
+	</delete>
+	<select id="selectTlApply" parameterType="int" resultType="tlApply">
+	select * from tl_apply
+	where tl_apply_seq=#{tlApplySeq}
+	</select>
+	<select id="selectBackApply" parameterType="int" resultType="acaStatus">
+	select * from aca_status
+	where aca_change_seq=#{acaChangeSeq}
+	</select>
+
+</mapper>

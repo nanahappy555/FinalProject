@@ -1,0 +1,121 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StuCounsel-Mapper">
+	<sql id="search">
+		<if test="searchType == 'n'.toString()">
+		and name like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'p'.toString()">
+		and CS_LOCATION like '%'||#{keyword}||'%'			
+		</if>
+		<if test="orderType == 's'.toString()">
+		order by app_status_cd desc
+		</if>
+		<if test="orderType == 'sc'.toString()">
+		order by APPLY_DATE	asc
+		</if>
+		
+	</sql>
+	
+
+
+	<select id="selectCounselApplyList" parameterType="String" resultType="csApply">
+		select (select name from prof where prof_cd=prof_id) as prof_id,rej_reason,
+			 stu_id,
+			 apply_date,
+			(select comm_cd_func('applyStatusCd',app_status_cd)
+			from dual) as app_status_cd,
+			cs_location, app_content, counsel_no
+			
+		  from cs_apply
+		 where stu_id = #{stuId}
+	</select>
+	
+	<select id="selectCounselApplyListByProfId" parameterType="String" resultType="csApply">
+		select COUNSEL_NO,COUNSEL_CONTENT, PROF_ID, cs_apply.STU_ID, APPLY_DATE, (select comm_cd_func('applyStatusCd',app_status_cd)
+			from dual) as app_status_cd, APP_CONTENT, CS_LOCATION,name as stu_name from cs_apply ,student
+			where student.stu_cd = cs_apply.stu_id
+			and prof_id = #{profId}
+		 	<include refid="search"/>
+	</select>
+	<select id="selectToTalCounselApplyListByProfId"  resultType="int">
+		select count(*) from (select COUNSEL_NO, PROF_ID, cs_apply.STU_ID, APPLY_DATE, (select comm_cd_func('applyStatusCd',app_status_cd)
+			from dual) as app_status_cd, APP_CONTENT, CS_LOCATION,name as stu_name from cs_apply ,student
+			where student.stu_cd = cs_apply.stu_id
+			and prof_id = #{profId}
+		 <include refid="search"/>)
+	</select>
+
+	<select id="selectCounselProfList" parameterType="String" resultType="counselProfList">
+		select prof_cd, name,major_name,phone,email_addr,ano_cd from prof a, major b
+		 where a.major_cd=b.major_cd
+		   and prof_posi_cd='dir'
+		   and a.major_cd=(select major_cd from stu_major where stu_id=#{stuId} and maj_class_cd=1)
+	</select>
+	
+	<select id="selectCounselProfPic" parameterType="str" resultType="counselProfList">
+		select ano_cd
+		from prof
+		where prof_cd =#{profCd}
+		
+	</select>
+	
+	<select id="selectCounselProfInfo" parameterType="String" resultType="counselProfList">
+		select prof_cd,name,ano_cd
+		  from prof
+		 where prof_cd =#{profCd}
+	</select>
+	<select id="selectCounselApplyDetail" parameterType="int" resultType="csApply">
+	select COUNSEL_NO,COUNSEL_CONTENT, PROF_ID, cs_apply.STU_ID, APPLY_DATE, (select comm_cd_func('applyStatusCd',app_status_cd)
+			from dual) as app_status_cd, APP_CONTENT, CS_LOCATION,name as stu_name from cs_apply ,student
+			where student.stu_cd = cs_apply.stu_id
+			and counsel_no = #{counselNo}
+	</select>
+	
+	
+	<insert id="insertCounselApply" parameterType="csApply">
+		insert 
+		   into cs_apply
+		        (
+				counsel_no, 
+				prof_id, 
+				stu_id, 
+				apply_date, 
+				app_status_cd, 
+				app_content
+				)
+		values (
+				#{counselNo}, 
+				#{profId},  
+				#{stuId}, 
+				#{applyDate}, 
+				#{appStatusCd},  
+				#{appContent}
+				)
+	</insert>
+	<select id="selectCouncelNoNextVal" resultType="int">
+		select COUNSEL_NO.nextval from dual
+	</select>
+	
+	<update id="updateStatus" parameterType="csApply">
+	update cs_apply
+	set app_status_cd = #{appStatusCd}
+	where counsel_no = #{counselNo}
+	</update>
+	
+	<update id="updateClassroom" parameterType="csApply">
+	update cs_apply
+	set app_status_cd = #{appStatusCd}
+	, cs_location = #{csLocation}
+	where counsel_no = #{counselNo}
+	</update>
+	
+	<update id="updateCounselContent" parameterType="csApply">
+	update cs_apply
+	set counsel_content = #{counselContent}
+	where counsel_no = #{counselNo}
+	</update>
+	
+</mapper>

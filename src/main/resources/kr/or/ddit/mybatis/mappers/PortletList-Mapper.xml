@@ -1,0 +1,25 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PortletList-Mapper">
+	<select id="selectDefaultWidgetList" parameterType="str" resultType="int">
+		select id
+		from portlet_list
+		where default_cd = 'Y'
+		and (mem_class_cd = 'all' or mem_class_cd = #{memClassCd})
+	</select>
+	<select id="selectNotDefaultWidgetList" resultType="int">
+		select id
+		from portlet_list
+		where default_cd = 'N'
+		and (mem_class_cd = 'all' or mem_class_cd = #{memClassCd})
+	</select>
+	
+	<select id="selectAllWidgetListByMemClassCd" parameterType="str" resultType="portletList">
+		select id,w,h,no_resize,default_cd
+		from portlet_list
+		where (mem_class_cd = 'all' or mem_class_cd = #{memClassCd})
+	</select>
+	
+</mapper>

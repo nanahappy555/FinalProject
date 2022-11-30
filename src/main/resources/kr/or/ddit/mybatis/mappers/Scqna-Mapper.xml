@@ -1,0 +1,111 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Scqna-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and sc_title like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and writer like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and sc_content like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'tc'.toString()">
+			and (
+			sc_title like '%'||#{keyword}||'%'
+			or
+			sc_content like '%'||#{keyword}||'%'						
+			)			
+		</if>
+		<if test="searchType == 'cw'.toString()">
+			and (
+			writer like '%'||#{keyword}||'%'
+			or
+			sc_content like '%'||#{keyword}||'%'						
+			)			
+		</if>
+		<if test="searchType == 'tcw'.toString()">
+			and (
+			sc_title like '%'||#{keyword}||'%'
+			or
+			writer like '%'||#{keyword}||'%'
+			or
+			sc_content like '%'||#{keyword}||'%'						
+			)			
+		</if>
+	</sql>
+
+
+	<select id="selectScqnaList" resultType="scQna">
+		SELECT *
+		FROM SC_QNA
+		where scq_bno is not null
+		<include refid="search" />
+		ORDER BY cdate desc
+	</select>
+
+	<select id="selectScqnaDetail" parameterType="int"
+		resultType="scQna">
+		SELECT *
+		FROM SC_QNA
+		WHERE SCQ_BNO=#{scqBno}
+	</select>
+
+	<select id="selectScqBnoSeqNext" resultType="int">
+		SELECT
+		SCQ_BNO.NEXTVAL AS SCQ_BNO FROM DUAL
+	</select>
+	
+	<select id="selectScqnaTotalCount" resultType="int">
+		select count(*)
+		from SC_QNA
+		where scq_bno is not null
+		<include refid="search" />
+		ORDER BY CDATE DESC
+	</select>
+
+	<update id="insertScqna" parameterType="scQna">
+		INSERT INTO
+		SC_QNA(SCQ_BNO,SC_TITLE,SC_CONTENT,CDATE,VIEW_CNT,WRITER,SECRET_CD,SC_RCONTENT,REDATE)
+		VALUES(SCQ_BNO.NEXTVAL,#{scTitle},#{scContent},SYSDATE,0,#{writer},#{secretCd},NULL,NULL)
+	</update>
+	
+	<update id="insertReply" parameterType="scQna">
+		UPDATE SC_QNA
+		SET SC_RCONTENT = #{scRcontent},
+		REDATE = SYSDATE
+		WHERE SCQ_BNO = #{scqBno}	
+	</update>
+	
+
+	<update id="modifyReply" parameterType="scQna">
+		UPDATE SC_QNA
+		SET SC_RCONTENT = #{scRcontent},
+		REDATE = SYSDATE
+		WHERE SCQ_BNO = #{scqBno}
+	</update>
+	
+	<delete id="deleteScqna" parameterType="int">
+		DELETE FROM SC_QNA
+		WHERE SCQ_BNO = #{scqBno}
+	</delete>
+
+	<update id="increaseViewCnt" parameterType="int">
+		UPDATE SC_QNA
+		SET VIEW_CNT = VIEW_CNT + 1
+		WHERE SCQ_BNO = #{scqBno}
+	</update>
+	
+	<select id="selectBnoCount" resultType="int">
+		select count(*)scq_bno from sc_qna
+	</select>
+
+	<select id="selectNullCount" resultType="int">
+		select count(*) from sc_qna
+		where sc_rcontent is NOT null
+	</select>
+</mapper>

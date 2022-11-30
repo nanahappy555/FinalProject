@@ -1,0 +1,107 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Syllabus-Mapper">
+<sql id="search">
+		<if test="searchType == 'name'.toString()">
+			and subj_name like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'prof'.toString()">
+			and name like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'status'.toString()">
+			order by apply_status_cd desc
+		</if>
+		</sql>
+
+
+	<select id="selectSyllabusList" resultType="syllabus" parameterType="String">
+		select *
+		from SYLLABUS
+		where prof_id = #{profId}
+	</select>
+	
+	<select id="selectSyllabusBySylCd" parameterType="String" resultType="syllabus">
+		select *
+		from SYLLABUS
+		where SYL_CD = #{SYL_CD}
+		and seme_cd = '202202'
+	</select>
+	
+	<select id="selectSyllabusByProfId" parameterType="kr.or.ddit.command.CriteriaLec" resultType="syllabus">
+		select a.subj_cd, a.subj_name,c.name,b.syl_cd,b.APPLY_DATE,
+        	comm_cd_func('lecCategoryCd',a.lec_category_cd) as lec_category_cd,b.max_stu_num,
+        	a.credit,comm_cd_func('applyStatusCd',b.apply_status_cd) as apply_status_cd
+		from lec_manage a,syllabus b,prof c
+		where a.subj_cd=b.subj_cd and b.prof_id =c.prof_cd
+		and prof_id = #{profId}
+		and seme_cd = '202202'
+		order by apply_date desc
+	</select>
+	
+	<select id="selectCountByProfId" parameterType="kr.or.ddit.command.CriteriaLec" resultType="int">
+		select count(*)
+		from SYLLABUS
+		where prof_id = #{profId}
+		and seme_cd = '202202'
+	</select>
+	
+	<select id="selectNextVal" resultType="int">
+		select substr(SYL_CD,4)+1 from  syllabus where rownum = 1 order by SYL_CD desc
+	</select>
+	
+	<select id="selectManageSyllabus" resultType="syllabusManege">
+		select a.subj_cd, a.subj_name,c.name,b.syl_cd,
+        	comm_cd_func('lecCategoryCd',a.lec_category_cd) as lec_category_cd,b.max_stu_num,
+        	a.credit,comm_cd_func('applyStatusCd',b.apply_status_cd) as apply_status_cd
+		from lec_manage a,syllabus b,prof c
+		where a.subj_cd=b.subj_cd and b.prof_id =c.prof_cd
+		<include refid="search" />
+	</select>
+	
+	<select id="selectSyllabusCount" resultType="int">
+		select count(*) from (select a.subj_cd, a.subj_name,c.name,b.syl_cd,
+       		comm_cd_func('lecCategoryCd',a.lec_category_cd) as lec_category_cd,b.max_stu_num,
+        	a.credit,comm_cd_func('applyStatusCd',b.apply_status_cd) as apply_status_cd
+		from lec_manage a,syllabus b,prof c
+		where a.subj_cd=b.subj_cd and b.prof_id =c.prof_cd
+		<include refid="search" />)
+	</select>
+	
+	<update id="updateSyllabusApply" parameterType="syllabus" >
+		UPDATE SYLLABUS
+		SET APPLY_STATUS_CD = #{applyStatusCd},
+				REJ_REASON = #{rejReason}
+		WHERE syl_cd= #{sylCd}
+	</update>
+	
+	<select id="selectSyllabusDetail" parameterType="str" resultType="syllabusDetail">
+		 select b.syl_cd,b.classroom,a.subj_cd,comm_cd_func('lecCategoryCd',a.lec_category_cd) as lec_category_cd,comm_cd_func('targetGrade',a.target_grade) as target_grade,a.credit,
+		 b.max_stu_num,b.lec_hour,b.materials,comm_cd_func('geCd',a.ge_cd) as ge_cd,
+		 c.mid_ratio,c.final_ratio,c.assign_ratio,c.attend_ratio,b.rej_reason,
+		 comm_cd_func('evalClassCd',b.eval_class_cd) as eval_class_cd,b.lec_date_1,b.lec_date_2,
+		 b.outline
+		 from lec_manage a,syllabus b,marks_std c
+		 where a.subj_cd = b.subj_cd and b.syl_cd = c.syl_cd 
+		 and b.syl_cd=#{sylCd}
+	</select>
+	
+	<select id="selectDetatilWeek" parameterType="str" resultType="weekLearning">
+	 select * from week_learning
+	 where syl_cd = #{sylCd}
+	</select>
+	
+	<select id="updateRejReason">
+		update syllabus
+		set rej_reason = #{rejReason}
+		where syl_cd=#{sylCd}
+	</select>
+	
+	<insert id="insertSyllabus" parameterType="syllabus">
+		insert into syllabus (SYL_CD, MAX_STU_NUM, APPLY_STATUS_CD, APPLY_DATE, APPROVE_DATE, PROF_ID, SUBJ_CD, OUTLINE, LEC_HOUR, MATERIALS, REJ_REASON, EVAL_CLASS_CD, LEC_DATE_1, LEC_DATE_2, CLASSROOM, SEME_CD)
+		values(#{sylCd},#{maxStuNum},#{applyStatusCd},sysdate,#{approveDate},#{profId},#{subjCd},#{outline},#{lecHour},#{materials},#{rejReason},#{evalClassCd},#{lecDate1},#{lecDate2},#{classroom},#{semeCd})
+	</insert>
+	
+	
+</mapper>

@@ -1,0 +1,58 @@
+@charset "UTF-8";
+/**
+푸터 위 공백
+**/
+
+/**
+테이블 th, td
+**/
+.table thead th,
+.table th {
+	text-align: center;
+	font-weight: bold;
+}
+
+.table td{
+	text-align: center;
+}
+
+/**
+테이블 제목컬럼 왼쪽정렬
+**/
+tr > .table-title{
+	text-align: left;
+}
+
+/**
+a:hover
+**/
+a:hover {
+    color: #004085;
+    text-decoration: none;
+/*     font-weight: bold; */
+}
+
+
+<!--스윗알러트 -->
+.style1 {
+ --dd-primary: 5969ff;
+ --dd-gradient : linear-gradient(45deg, #5969ff 0%, #5969ff 100%);
+ --dd-monthBackground:    var(--dd-gradient);
+ --dd-confirmButtonBackground : var(--dd-gradient);
+ --dd-selectedBackground : var(--dd-gradient);
+ 
+}
+
+/**
+인풋 파일 테두리, 그림자
+**/
+input[type=file] {
+    color: #71748d;
+    background-color: #ffffff;
+    border-color: none;
+    outline: 0;
+    box-shadow: none;
+}
+
+
+ 	

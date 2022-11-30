@@ -1,0 +1,117 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Alarm-Mapper">
+	<select id="selectUchkList" parameterType="String" resultType="alarm">
+		select prefix,
+				(select comm_cd_name from comm_cd where comm_cd_gr='contentCd' and comm_cd_val=content_cd) as alarmContent,
+			    to_char(cdate,'YYYY-MM-DD') as cdate
+		from alarm
+		where mem_id = #{memId}
+		and check_cd = 'uchk'
+		and cdate between sysdate-3 and sysdate
+		order by cdate desc
+	</select>
+	<select id="selectChkList" parameterType="String" resultType="alarm">
+		select prefix,
+				(select comm_cd_name from comm_cd where comm_cd_gr='contentCd' and comm_cd_val=content_cd) as alarmContent,
+			    to_char(cdate,'YYYY-MM-DD') as cdate
+		from alarm
+		where mem_id = #{memId}
+		and check_cd = 'chk'
+		and cdate between sysdate-3 and sysdate
+		order by cdate desc
+	</select>
+
+	<select id="selectAlarmUchkCount" parameterType="String" resultType="int">
+		select count(*)
+		from alarm
+		where mem_id = #{memId}
+		and check_cd = 'uchk'
+	</select>	
+
+	<update id="updateFromUchkToChk" parameterType="String">
+		update alarm
+		set check_cd = 'chk'
+		where mem_id = #{memId}
+		and check_cd = 'uchk'
+	</update>
+	
+	<update id="insertAlarmFromLecture">
+		insert into
+		ALARM(alarm_seq,mem_id,content_cd,check_cd,cdate,prefix)
+		values(
+				#{alarmSeq},
+				#{memId},
+				'newPost',
+				'uchk',
+				sysdate,
+				(select SUBJ_NAME
+				from lec_manage
+				where subj_cd=( select SUBJ_CD
+				                from syllabus
+				                where syl_cd=#{sylCd})) || #{boardName})
+	</update>
+	
+	<update id="insertAlarmFromLectureQna">
+		insert into
+		ALARM(alarm_seq,mem_id,content_cd,check_cd,cdate,prefix)
+		values(
+				#{alarmSeq},
+				#{memId},
+				'newResponse',
+				'uchk',
+				sysdate,
+				(select SUBJ_NAME
+				from lec_manage
+				where subj_cd=( select SUBJ_CD
+				                from syllabus
+				                where syl_cd=#{sylCd})) || #{boardName})
+	</update>
+	
+	<update id="insertAlarmFromQna">
+		insert into
+		ALARM(alarm_seq,mem_id,content_cd,check_cd,cdate,prefix)
+		values(
+				#{alarmSeq},
+				#{memId},
+				'newResponse',
+				'uchk',
+				sysdate,
+				#{prefix})
+	</update>
+	
+	<update id="insertAlarmFromNewCS">
+		insert into
+		ALARM(alarm_seq,mem_id,content_cd,check_cd,cdate,prefix)
+		values(
+				#{alarmSeq},
+				#{memId},
+				'newCounsel',
+				'uchk',
+				sysdate,
+				#{name} || ' 학생')
+	</update>
+	
+	<update id="insertAlarmFromApproved">
+		insert into
+		ALARM(alarm_seq,mem_id,content_cd,check_cd,cdate,prefix)
+		values(
+				#{alarmSeq},
+				#{memId},
+				'newApproved',
+				'uchk',
+				sysdate,
+				#{name} || ' 교수')
+	</update>
+	
+	<update id="insertAlarm">
+		insert into 
+		ALARM(alarm_seq,mem_id,content_cd,check_cd,cdate,prefix)
+		values(#{alarmSeq}, #{memId},#{contentCd},#{checkCd},sysdate,#{prefix})
+	</update>
+	
+	<select id="selectAlarmSeqNext" resultType="int">
+		select alarm_seq.nextval as alarm_seq from dual
+	</select>
+</mapper>

@@ -1,0 +1,17 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BookHistory-Mapper">
+	
+	<select id="selectBookHistory"  resultType="bookHistory">
+		SELECT *
+		FROM BOOK_HISTORY
+	</select>
+	
+	<update id="insertBookHistory" parameterType="bookHistory">
+		INSERT INTO BOOK_HISTORY(BOOK_HISTORY_CD, ID, ISBN, RENT_DATE,RETURN_DATE)
+		VALUES (#{BOOK_HISTORY_CD},#{ID},#{ISBN},#{RENT_DATE},#{RETURN_DATE})
+	</update>
+	
+</mapper>

@@ -1,0 +1,49 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StuSchol-Mapper">
+	<select id="selectManageList" parameterType="String" resultType="scholManage">
+		select SCHOL_CD, SCHOL_NAME, SCHOL_AMOUNT, CONTENT, BENEF_NUM, START_DATE, REQ_DOC_CONTENT,ICON, TARGET, END_DATE
+		  from schol_manage
+
+	</select>
+	
+	<select id="selectManageRegistList" parameterType="str" resultType="student">
+		select stu_cd,(select major_name_func(#{stuCd}) from dual) as fir_maj_name, acc_holder, bank_name, acc_num
+			from student
+			where stu_cd=#{stuCd}
+	</select>
+	
+	<select id="selectApplyInfo" parameterType="String" resultType="scholApplyInfo">
+		select schol_app_seq, grade, stu_semester,a.schol_name, a.schol_amount, b.apply_date,
+			   comm_cd_func('applyStatusCd',b.apply_status_cd) as apply_status_cd,seme_cd
+		  from schol_manage a, schol_apply b, student c
+		 where a.schol_cd = b.schol_cd
+		   and b.stu_id=c.stu_cd
+		   and b.stu_id= #{stuCd}
+	</select>
+	
+	
+	<insert id="insertInfo" parameterType="scholApply" >
+		insert into schol_apply (
+			schol_app_seq, schol_cd, apply_date, apply_status_cd, stu_id, seme_cd
+			)
+
+		values (
+			#{scholAppSeq}, #{scholCd}, sysdate, #{applyStatusCd}, #{stuId}, #{semeCd}
+			)
+		
+	</insert>
+	
+	<delete id="deleteInfo" parameterType="scholApply">
+		delete 
+		  from schol_apply
+		 where schol_app_seq = #{scholAppSeq}
+		   and stu_id = #{stuId}
+	</delete>
+	
+	<select id="selectScholAppSeqNextVal" resultType="int">
+		select schol_app_seq.nextval from dual
+	</select>
+</mapper>

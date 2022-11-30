@@ -1,0 +1,109 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LecQna-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and title like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and stuName like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and content like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'tc'.toString()">
+			and (
+			title like '%'||#{keyword}||'%'
+			or
+			content like '%'||#{keyword}||'%'						
+			)			
+		</if>
+		<if test="searchType == 'cw'.toString()">
+			and (
+			stuName like '%'||#{keyword}||'%'
+			or
+			content like '%'||#{keyword}||'%'						
+			)			
+		</if>
+		<if test="searchType == 'tcw'.toString()">
+			and (
+			title like '%'||#{keyword}||'%'
+			or
+			stuName like '%'||#{keyword}||'%'
+			or
+			content like '%'||#{keyword}||'%'						
+			)			
+		</if>
+	</sql>
+
+
+	<select id="selectLecQnaList" resultType="lecQna">
+		SELECT lq.LECQ_BNO, lq.STU_CD, lq.LEC_CD, lq.CONTENT, lq.CDATE, lq.VIEW_CNT ,lq.SECRET_CD, lq.TITLE, lq.RDATE, lq.PROF_CD,lq.RESPONSE,pr.name as profName,st.name as stuName
+		FROM LEC_QNA lq,student st,prof pr
+        where lq.stu_cd = st.stu_cd
+        and lq.prof_cd = pr.prof_cd
+		and lq.lec_cd = #{lecCd}
+		<include refid="search" />
+		ORDER BY lq.CDATE DESC
+	</select>
+
+	<select id="selectLecQnaDetail" parameterType="int" resultType="lecQna">
+		SELECT LECQ_BNO,lq.STU_CD,lq.LEC_CD,CONTENT,lq.CDATE,lq.VIEW_CNT,lq.SECRET_CD,lq.TITLE,RDATE,lq.PROF_CD,RESPONSE,pr.name as profName,st.name as stuName
+		FROM LEC_QNA lq,student st,prof pr
+        where lq.stu_cd = st.stu_cd
+        and lq.prof_cd = pr.prof_cd
+		and LECQ_BNO=#{lecqBNO}
+	</select>
+
+	<select id="selectLecqBnoSeqNext" resultType="int">
+		SELECT LECQ_BNO.NEXTVAL FROM DUAL
+	</select>
+	
+	<select id="selectLecQnaTotalCount" resultType="int">
+		select count(*)
+		from LEC_QNA
+		where lec_cd = #{lecCd}
+		<include refid="search" />
+	</select>
+	
+	<select id="selectQnaListByProfId" parameterType="str" resultType="lecQna">
+	<![CDATA[
+	select * from 
+	(select LECQ_BNO, lq.STU_CD, lq.LEC_CD, lq.CONTENT, lq.CDATE, lq.VIEW_CNT, lq.SECRET_CD, lq.TITLE, lq.RDATE, lq.PROF_CD, lq.RESPONSE,st.name as stuName
+		from LEC_QNA lq, student st
+		where lq.stu_Cd = st.stu_cd
+		and PROF_CD = #{profCd}
+	    and rdate is null
+	    order by cdate )
+	where rownum <=5
+	]]>
+	</select>
+	
+
+	<update id="insertLecQna" parameterType="lecQna">
+		INSERT INTO LEC_QNA (LECQ_BNO,STU_CD,LEC_CD,CONTENT,CDATE,VIEW_CNT,SECRET_CD,TITLE,RDATE,PROF_CD,RESPONSE)
+		VALUES(LECQ_BNO.NEXTVAL,#{stuCd},#{lecCd},#{content},SYSDATE,0,#{secretCd},#{title},NULL,#{profCd},NULL)
+	</update>
+	
+	<update id="updateReply" parameterType="lecQna">
+		UPDATE LEC_QNA
+		SET RESPONSE = #{response},
+		RDATE = SYSDATE
+		WHERE LECQ_BNO = #{lecqBno}	
+	</update>
+	
+	<delete id="deleteLecQna" parameterType="int">
+		DELETE FROM LEC_QNA
+		WHERE LECQ_BNO = #{lecqBno}
+	</delete>
+
+	<update id="increaseViewCnt" parameterType="int">
+		UPDATE LEC_QNA
+		SET VIEW_CNT = VIEW_CNT + 1
+		WHERE LECQ_BNO = #{lecqBno}
+	</update>
+
+</mapper>
